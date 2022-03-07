@@ -30,8 +30,8 @@ namespace felidae
 
         private:
 
-        bool process_command_line(int argc, char* argv[]);
-        bool init_logging(void);
+        ERC process_command_line(int argc, char* argv[]);
+        ERC init_logging(void);
 
         private:
 
@@ -43,6 +43,6 @@ namespace felidae
         std::string m_version = app_VERSION;
         std::string m_description = app_DESCRIPTION;
 
-        std::unique_ptr<felidae::Engine> m_engine;
+        std::unique_ptr<felidae::Engine> m_engine = nullptr;
     };
 }
