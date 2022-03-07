@@ -1,0 +1,5 @@
+set(PROJECT_HDRS
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/moda/moda.h
+
+PARENT_SCOPE)

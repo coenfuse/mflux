@@ -1,0 +1,5 @@
+set(PROJECT_SRCS
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/moda.cpp
+
+PARENT_SCOPE)
