@@ -36,6 +36,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/source/mo
 target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::moda)
 target_link_libraries(${PROJECT_NAME} PRIVATE CLI11::CLI11)
 target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
+target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
 
 # Creating an executable that links to its library equivalent that we made above.
 # This is vital in creating a testing target for this target.

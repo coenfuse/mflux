@@ -15,3 +15,8 @@ if(NOT TARGET fmt)
     add_subdirectory(fmt)
     set_target_properties("fmt" PROPERTIES FOLDER "thirdparty")
 endif()
+
+if(NOT TARGET spdlog)
+    add_subdirectory(spdlog)
+    set_target_properties("spdlog" PROPERTIES FOLDER "thirdparty")
+endif()

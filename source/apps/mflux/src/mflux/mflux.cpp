@@ -1,6 +1,7 @@
 // standard includes
 #include <chrono>
 #include <thread>
+#include <vector>
 
 // internal includes
 #include "mflux/mflux.h"
@@ -11,6 +12,7 @@
 // third party includes
 #include "CLI/CLI.hpp"
 #include "fmt/format.h"
+#include "spdlog/spdlog.h"
 
 
 
@@ -81,15 +83,15 @@ namespace felidae
     {
         ERC status = ERC::SUCCESS;
 
-        CLI::App app;
+        CLI::App parser;
 
-        app.add_option("--config", m_config_file, "JSON file containing mflux configurations")->required()->option_text("<filename>");
-        app.add_flag("--stdout", m_is_logging_to_std, "Display runtime log on console");
-        app.add_flag("-v", m_is_verbose, "Increase verbosity of log displayed on console \n--stdout must be enabled to use this");
+        parser.add_option("--config", m_config_file, "JSON file containing mflux configurations")->required()->option_text("<filename>");
+        parser.add_flag("--stdout", m_is_logging_to_std, "Whether to display the log on console");
+        parser.add_flag("-v", m_is_verbose, "Increase verbosity of log 'if' being displayed");
 
         try
         {
-            app.parse(argc, argv);
+            parser.parse(argc, argv);
         }
         catch (const CLI::ParseError& e)
         {
@@ -97,7 +99,7 @@ namespace felidae
 
             fmt::print("ERROR: {}\n\n", e.what());
             fmt::print("{} v{} (c) 2022-2023 Felidae Systems Inc.\n\n", m_name, m_version);
-            fmt::print(app.help());
+            fmt::print(parser.help());
         }
 
         return status;
@@ -108,7 +110,23 @@ namespace felidae
     {
         ERC status = ERC::SUCCESS;
 
-        // ..
+        // Parse config file and get log directory. Assume currently logdir 
+        std::string log_dir = "./logs";
+
+        if (!std::filesystem::exists(log_dir))
+        {
+            if (!std::filesystem::create_directories(log_dir))
+            {
+                std::cerr << fmt::format("ERROR : Unable to create log dir '{}'", log_dir);
+                status = ERC::FAILURE;
+            }
+        }
+
+        if (status == ERC::SUCCESS)
+        {
+            // Setup sinks for logger
+            std::vector<spdlog::sink_ptr> sinks;
+        }
 
         return status;
     }
