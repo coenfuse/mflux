@@ -5,7 +5,7 @@ add_subdirectory(include)
 add_subdirectory(src)
 
 # Setting up target
-project("mflux" VERSION 0.3.0.0 DESCRIPTION "A gateway application for data transfer between MQTT and InfluxDB")
+project("mflux" VERSION 0.4.0.0 DESCRIPTION "A gateway application for data transfer between MQTT and InfluxDB")
 
 # Setting up target specific options
 option(PROJ_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)

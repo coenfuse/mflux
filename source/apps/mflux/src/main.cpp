@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
-        std::cerr << fmt::format("Exception : {}", e.what());
+        std::cerr << fmt::format("Exception in {}", e.what());
         error_code = felidae::ERC::EXCEPTION;
     }
 
