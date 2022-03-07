@@ -21,7 +21,7 @@
 
 * In Mflux, we use the [doctest](https://github.com/doctest/doctest) to create our unit tests and [ctest](https://cmake.org/cmake/help/latest/manual/ctest.1.html) to organize them in a proper hierarchy. This hierarchy ensures the tests are structured in a logical order which further enables us to perform complete sequence or a subset of unit tests conveniently as per the requirement.
     - To run the unit tests, first make sure to have the mflux project generated and built with this option `-DBUILD_TESTS=ON`
-    - Then go to the directory where the target executables are present and simply type `ctest` in the terminal. If the project is setup correctly, all the tests will be discovered, executed and reported.
+    - Then go to the directory where the target executables are present and simply type `ctest -C Debug` in the terminal. If the project is setup correctly, all the tests will be discovered, executed and reported.
     - Selective execution of subset of the unit tests is under development and will be implemented once the project reach a certain level of horizontal scale.  
 
 * Deployment instructions, todo.
