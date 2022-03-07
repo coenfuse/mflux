@@ -9,6 +9,7 @@
 // ..
 
 // third party includes
+#include "CLI/CLI.hpp"
 #include "fmt/format.h"
 
 
@@ -80,7 +81,24 @@ namespace felidae
     {
         ERC status = ERC::SUCCESS;
 
-        // ..
+        CLI::App app;
+
+        app.add_option("--config", m_config_file, "JSON file containing mflux configurations")->required()->option_text("<filename>");
+        app.add_flag("--stdout", m_is_logging_to_std, "Display runtime log on console");
+        app.add_flag("-v", m_is_verbose, "Increase verbosity of log displayed on console \n--stdout must be enabled to use this");
+
+        try
+        {
+            app.parse(argc, argv);
+        }
+        catch (const CLI::ParseError& e)
+        {
+            status = ERC::EXCEPTION;
+
+            fmt::print("ERROR: {}\n\n", e.what());
+            fmt::print("{} v{} (c) 2022-2023 Felidae Systems Inc.\n\n", m_name, m_version);
+            fmt::print(app.help());
+        }
 
         return status;
     }

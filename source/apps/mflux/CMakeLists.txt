@@ -5,7 +5,7 @@ add_subdirectory(include)
 add_subdirectory(src)
 
 # Setting up target
-project("mflux" VERSION 0.2.0.0 DESCRIPTION "A gateway application for data transfer between MQTT and InfluxDB")
+project("mflux" VERSION 0.3.0.0 DESCRIPTION "A gateway application for data transfer between MQTT and InfluxDB")
 
 # Setting up target specific options
 option(PROJ_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
@@ -34,6 +34,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/source/mo
 
 # Linking target with its modules or library depdencies (PRIVATE / PUBLIC / INTERFACE)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::moda)
+target_link_libraries(${PROJECT_NAME} PRIVATE CLI11::CLI11)
 target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
 
 # Creating an executable that links to its library equivalent that we made above.

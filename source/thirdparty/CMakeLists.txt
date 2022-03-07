@@ -2,6 +2,10 @@
 # libraries that are used in this workspace
 
 # Enable or disable existing ones by commenting them out
+if(NOT TARGET cli11)
+    add_subdirectory(cli11)
+endif()
+
 if(NOT TARGET doctest_with_main)
     add_subdirectory(doctest)
     set_target_properties("doctest_with_main" PROPERTIES FOLDER "thirdparty")
