@@ -15,11 +15,8 @@
 # add_subdirectory(<folder_name>)
 # list(APPEND ALL_HDRS ${NAME_OF_HEADER_GROUP})
 
-add_subdirectory(unita)
-list(APPEND ALL_HDRS ${UNITA_HDRS})
-
-add_subdirectory(unitb)
-list(APPEND ALL_HDRS ${UNITB_HDRS})
+add_subdirectory(mflux)
+list(APPEND ALL_HDRS ${MFLUX_HDRS})
 
 # ..
 

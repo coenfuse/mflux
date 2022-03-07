@@ -15,11 +15,8 @@
 # add_subdirectory(<folder_name>)
 # list(APPEND ALL_SRCS ${NAME_OF_SOURCE_GROUP})
 
-add_subdirectory(unita)
-list(APPEND ALL_SRCS ${UNITA_SRCS})
-
-add_subdirectory(unitb)
-list(APPEND ALL_SRCS ${UNITB_SRCS})
+add_subdirectory(mflux)
+list(APPEND ALL_SRCS ${MFLUX_SRCS})
 
 # ..
 

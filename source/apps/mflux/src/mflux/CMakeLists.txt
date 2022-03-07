@@ -1,24 +1,24 @@
-# In this CMakeLists we add all the header files that are
-# required with the unit 'unitb'. All the header files
+# In this CMakeLists we add all the source files that are
+# required with the unit 'mflux'. All the source files
 # for the current unit are listed here, which are then
-# accessed by the target-wide header list to make up the
-# target includes. The target-wide header list references
+# access by the target-wide source list to make up the
+# target includes. The target-wide source list references
 # to this local list by its variable that is defined below
-# as UNITA_HDRS. 
+# as MFLUX_SRCS. 
 # One can change it according to the name of this variable
 # to anything according to the requirment, but the user
 # need to make sure the exact same variable name is used in
-# the target-wide header list one-directory above.
+# the target-wide source list one-directory above.
 # To keep up with simple convention, user is recommended to
-# use the following pattern for naming a unit header list:
-# <folder_name>_HDRS
+# use the following pattern for naming a unit source list:
+# <folder_name>_SRCS
 
 # In cross-platform applications, a repository might contain
 # many cross-platform files in it. But during application's
 # compilation, only a selected files might get used according
 # to the platform the application is building for.
 
-# To help up with that issue, the headers of a unit
+# To help up with that issue, the source of a unit
 # can be categorized into two types:
 #  1. PLATFORM_INDEPENDENT_FILES: Files needed on all platforms
 #  2. PLATFORM_DEPENDENT_FILES: Files needed only on specific platforms
@@ -31,7 +31,7 @@
 # can be empty given that the PLATFORM_DEPENDENT_FILES list 
 # is not empty.
 list(APPEND PLATFORM_INDEPENDENT_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/unitb.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/mflux.cpp
     # ..
 )
 
@@ -65,7 +65,7 @@ endif()
 # Here we combine both platform dependent and independent
 # files into a single list. Don't change anything here,
 # except the variable value.
-set(UNITB_HDRS
+set(MFLUX_SRCS
     ${PLATFORM_INDEPENDENT_FILES}
     ${PLATFORM_DEPENDENT_FILES}
 

@@ -2,34 +2,30 @@
 #include <iostream>
 
 // internal includes
-#include "app-config.h"
-#include "unita/unita.h"
-#include "unitb/unitb.h"
+#include "mflux/mflux.h"
 
 // module includes
-#include "moda/moda.h"
+#include "errorcodes/errorcodes.h"
 
 // third party includes
 #include "fmt/format.h"
 
 
-int main(int argc, char** argv)
+
+int main(int argc, char* argv[])
 {
-    auto intro = fmt::format("I am an app called {} v{}", app_NAME, app_VERSION);
-    auto untro = fmt::format("I am made up of various units");
-    auto mntro = fmt::format("I use various modules as my dependencies");
-    auto tntro = fmt::format("I also use third party libs like fmt that is showing you this message");
+    felidae::ERC error_code = felidae::ERC::SUCCESS;
     
-    fmt::print("{}\n{}\n{}\n{}\n\n", intro, untro, mntro, tntro);
+    std::unique_ptr<felidae::Mflux> p_Mflux = std::make_unique<felidae::Mflux>();
+    try
+    {
+        error_code = p_Mflux->run(argc, argv);
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << fmt::format("Exception : {}", e.what());
+        error_code = felidae::ERC::EXCEPTION;
+    }
 
-    Unita aobj;
-    aobj.getInfo();
-
-    Unitb bobj;
-    bobj.getInfo();
-
-    Moda mobj;
-    mobj.getInfo();
-
-    return 0;
+    return static_cast<uint16_t>(error_code);
 }

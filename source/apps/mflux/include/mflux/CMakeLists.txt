@@ -1,10 +1,10 @@
 # In this CMakeLists we add all the header files that are
-# required with the unit 'unita'. All the header files
+# required with the unit 'mflux'. All the header files
 # for the current unit are listed here, which are then
 # accessed by the target-wide header list to make up the
 # target includes. The target-wide header list references
 # to this local list by its variable that is defined below
-# as UNITA_HDRS. 
+# as MFLUX_HDRS. 
 # One can change it according to the name of this variable
 # to anything according to the requirment, but the user
 # need to make sure the exact same variable name is used in
@@ -31,7 +31,7 @@
 # can be empty given that the PLATFORM_DEPENDENT_FILES list 
 # is not empty.
 list(APPEND PLATFORM_INDEPENDENT_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/unita.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/mflux.h
     # ..
 )
 
@@ -65,7 +65,7 @@ endif()
 # Here we combine both platform dependent and independent
 # files into a single list. Don't change anything here,
 # except the variable value.
-set(UNITA_HDRS
+set(MFLUX_HDRS
     ${PLATFORM_INDEPENDENT_FILES}
     ${PLATFORM_DEPENDENT_FILES}
 

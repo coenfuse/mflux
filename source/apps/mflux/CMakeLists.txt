@@ -5,7 +5,7 @@ add_subdirectory(include)
 add_subdirectory(src)
 
 # Setting up target
-project("mflux" VERSION 0.1.0.0)
+project("mflux" VERSION 0.2.0.0 DESCRIPTION "A gateway application for data transfer between MQTT and InfluxDB")
 
 # Setting up target specific options
 option(PROJ_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
@@ -30,6 +30,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/c
 
 # Including directories with target (PRIVATE / PUBLIC / INTERACE)
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
 
 # Linking target with its modules or library depdencies (PRIVATE / PUBLIC / INTERFACE)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::moda)
