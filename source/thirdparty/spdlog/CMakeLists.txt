@@ -11,7 +11,7 @@ include(cmake/ide.cmake)
 spdlog_extract_version()
 
 project(spdlog VERSION ${SPDLOG_VERSION} LANGUAGES CXX)
-message(STATUS "Build spdlog: ${SPDLOG_VERSION}")
+message(STATUS "Generating spdlog v${SPDLOG_VERSION}")
 
 include(GNUInstallDirs)
 
@@ -133,7 +133,7 @@ if(SPDLOG_TIDY)
 endif()
 
 find_package(Threads REQUIRED)
-message(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
+# message(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
 # ---------------------------------------------------------------------------------------
 # Static/Shared library (shared not supported in windows yet)
 # ---------------------------------------------------------------------------------------

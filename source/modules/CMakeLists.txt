@@ -4,3 +4,4 @@
 add_subdirectory(configurator)
 add_subdirectory(influx)
 add_subdirectory(memdb)
+add_subdirectory(minix)
