@@ -5,7 +5,7 @@ set(PROJECT_HDRS "include/configurator/configurator.h")
 set(PROJECT_SRCS "src/configurator.cpp")
 
 # Setting up target
-project("configurator" VERSION 0.1.2)
+project("configurator" VERSION 0.2.0)
 
 # Setting up target specific options
 # option(CONF_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
@@ -28,6 +28,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES 
 # Linking target with directories it is dependent on
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/thirdparty/nlohmann-json/include/")
 
 # [BUG : Not Working] Setup public API for this library
 set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/${PROJECT_NAME}.h")

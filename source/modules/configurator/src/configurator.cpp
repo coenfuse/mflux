@@ -12,7 +12,7 @@
 
 // third party includes
 #include "spdlog/spdlog.h"
-// json
+#include "json/json.hpp"
 
 
 
