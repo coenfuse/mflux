@@ -9,6 +9,7 @@
 
 // other includes
 #include "errorcodes/errorcodes.h"
+#include "json/json.hpp"
 
 // forward references
 namespace felidae
@@ -73,6 +74,6 @@ namespace felidae
 
     private:
 
-        std::string m_config_json;
+        nlohmann::json m_config_json;
     };
 }

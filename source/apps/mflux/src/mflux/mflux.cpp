@@ -23,7 +23,7 @@ namespace felidae
     class Engine
     {
     public:
-        Engine(std::string config_file){}
+        Engine(){}
         ~Engine(){}
 
         ERC start(void) { return ERC::SUCCESS; }
@@ -57,7 +57,7 @@ namespace felidae
             spdlog::info("Starting {}", m_name);
 
         if (status == ERC::SUCCESS)
-            m_engine = std::make_unique<felidae::Engine>(m_config_file);
+            m_engine = std::make_unique<felidae::Engine>();
 
         if (m_engine == nullptr)
             status = ERC::MEMORY_ALLOCATION_FAILED;
@@ -86,9 +86,9 @@ namespace felidae
         ERC status = ERC::SUCCESS;
 
         CLI::App parser;
+        std::string config_file;
 
-        parser.add_option("--config", m_config_file, "JSON file containing mflux configurations")->required()->option_text("<filename>");
-        parser.add_option("--logdir", m_logdir, "Path to store the generated runtime logs")->required()->option_text("<path>");
+        parser.add_option("--config", config_file, "JSON file containing mflux configurations")->required()->option_text("<filename>");
         parser.add_flag("--stdout", m_is_logging_to_std, "Whether to display the log on console");
         parser.add_flag("-v", m_is_verbose, "Increase verbosity of log 'if' being displayed");
 
@@ -106,7 +106,10 @@ namespace felidae
         }
 
         // TODO : Perform additional checks for length of string, nullptr, exception etc.
-        // m_config = std::make_shared<felidae::Configurator>(m_config_file);
+        m_config = std::make_shared<felidae::Configurator>(config_file);
+
+        if (m_config == nullptr)
+            status = ERC::MEMORY_ALLOCATION_FAILED;
 
         return status;
     }
@@ -116,11 +119,13 @@ namespace felidae
     {
         ERC status = ERC::SUCCESS;
 
-        if (!std::filesystem::exists(m_logdir))
+        auto logdir = m_config->get_logdir();
+
+        if (!std::filesystem::exists(logdir))
         {
-            if (!std::filesystem::create_directories(m_logdir))
+            if (!std::filesystem::create_directories(logdir))
             {
-                std::cerr << fmt::format("ERROR : Unable to create log dir '{}'", m_logdir);
+                std::cerr << fmt::format("ERROR : Unable to create log dir '{}'", logdir);
                 status = ERC::FAILURE;
             }
         }
@@ -130,7 +135,7 @@ namespace felidae
             std::vector<spdlog::sink_ptr> sinks;
 
             // Add rotating file logging sink - Max file size of 10MB and max of 10 log files
-            auto log_file = fmt::format("{}/{}.log", m_logdir, m_name);
+            auto log_file = fmt::format("{}/{}.log", logdir, m_name);
             auto pFileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_file, 1048576 * 10, 10);
             sinks.push_back(pFileSink);
 
@@ -154,10 +159,9 @@ namespace felidae
             else
                 spdlog::set_level(spdlog::level::info);
 
-
             // Set pattern and flushing
             spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e UTC] [%L] %v", spdlog::pattern_time_type::utc);
-            spdlog::flush_on(spdlog::level::trace);
+            spdlog::flush_on((spdlog::level::level_enum)m_config->get_log_level());                     // Typecasting uint16_t to spdlog level_enum
         }
 
         return status;

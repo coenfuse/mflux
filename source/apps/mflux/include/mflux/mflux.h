@@ -37,8 +37,6 @@ namespace felidae
 
     private:
 
-        std::string m_config_file = "";
-        std::string m_logdir = "";
         bool m_is_logging_to_std = false;
         bool m_is_verbose = false;
 
