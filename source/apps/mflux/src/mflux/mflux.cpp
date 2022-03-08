@@ -116,8 +116,8 @@ namespace felidae
             fmt::print(parser.help());
         }
 
-        // TODO : Perform additional checks for length of string, nullptr, exception etc.
-        m_config = std::make_shared<felidae::Configurator>(config_file);
+        if(!config_file.empty())
+            m_config = std::make_shared<felidae::Configurator>(config_file);
 
         if (m_config == nullptr)
             status = ERC::MEMORY_ALLOCATION_FAILED;

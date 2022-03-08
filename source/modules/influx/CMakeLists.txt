@@ -1,15 +1,15 @@
 # This CMakeLists contain all the required build info for generating this target
 
 # Adding directories that contain source files
-set(PROJECT_HDRS "include/configurator/configurator.h")
-set(PROJECT_SRCS "src/configurator.cpp")
+set(PROJECT_HDRS "include/influx/client.h" "include/influx/message.h")
+set(PROJECT_SRCS "src/client.cpp")
 
 # Setting up target
-project("configurator" VERSION 0.1.0.2)
+project("influx" VERSION 0.1.0)
 
 # Setting up target specific options
-# option(CONF_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
-# option(CONF_BUILD_DOCS "Generate doxygen based docs for ${PROJECT_NAME}" OFF)
+option(INFLUX_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
+option(INFLUX_BUILD_DOCS "Generate doxygen based docs for ${PROJECT_NAME}" OFF)
 
 # Logging target build info
 message(STATUS "Generating ${PROJECT_NAME} v${PROJECT_VERSION}")
@@ -28,16 +28,13 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES 
 # Linking target with directories it is dependent on
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
-target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/source/thirdparty/nlohmann-json/include/")
-
-# [BUG : Not Working] Setup public API for this library
-# set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/${PROJECT_NAME}.h")
 
 # Linking target with its third-party dependencies
+target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
 
 # Building unit tests for target if enabled
-# if(CONF_BUILD_TESTS OR BUILD_TESTS)
-#     enable_testing()
-#     add_subdirectory(tests)
-# endif()
+if(INFLUX_BUILD_TESTS OR BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

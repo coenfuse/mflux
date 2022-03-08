@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 message(STATUS "Using CMake v${CMAKE_VERSION}")
 
 # Setting global workspace properties
-project("mflux-app" VERSION 0.5.0.0)
+project("mflux-app" VERSION 0.1.0)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".cmake")
 
