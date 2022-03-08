@@ -5,8 +5,8 @@
 #include "minix/minix.h"
 
 // module includes
-// influx message
-// mqtt message
+#include "influx/message.h"
+#include "mqtt/message.h"
 
 // thirdparty includes
 // ..

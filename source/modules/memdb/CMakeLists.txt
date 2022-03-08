@@ -5,7 +5,7 @@ set(PROJECT_HDRS "include/memdb/memdb.h")
 set(PROJECT_SRCS "src/memdb.cpp")
 
 # Setting up target
-project("memdb" VERSION 0.1.0.1)
+project("memdb" VERSION 0.1.0.2)
 
 # Setting up target specific options
 option(MEMDB_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
@@ -30,7 +30,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/i
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
 
 # Linking target with its third-party dependencies
-target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
 
 # Building unit tests for target if enabled

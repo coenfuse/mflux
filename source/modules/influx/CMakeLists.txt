@@ -5,7 +5,7 @@ set(PROJECT_HDRS "include/influx/client.h" "include/influx/message.h")
 set(PROJECT_SRCS "src/client.cpp")
 
 # Setting up target
-project("influx" VERSION 0.1.0.1)
+project("influx" VERSION 0.1.0.2)
 
 # Setting up target specific options
 option(INFLUX_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
@@ -30,8 +30,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/i
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
 
 # Linking target with its third-party dependencies
-target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
+# cinflux
 
 # Building unit tests for target if enabled
 if(INFLUX_BUILD_TESTS OR BUILD_TESTS)

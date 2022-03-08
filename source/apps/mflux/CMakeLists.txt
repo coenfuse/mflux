@@ -5,7 +5,7 @@ add_subdirectory(include)
 add_subdirectory(src)
 
 # Setting up target
-project("mflux" VERSION 0.1.0.13 DESCRIPTION "A gateway application for data transfer between MQTT and InfluxDB")
+project("mflux" VERSION 0.1.0.14 DESCRIPTION "A gateway application for data transfer between MQTT and InfluxDB")
 
 # Setting up target specific options
 option(PROJ_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
@@ -36,6 +36,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/source/mo
 target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::configurator)
 target_link_libraries(${PROJECT_NAME} PRIVATE CLI11::CLI11)
 target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${NAMESPACE}::influx)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${NAMESPACE}::memdb)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${NAMESPACE}::minix)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${NAMESPACE}::mqtt)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
 
 # Creating an executable that links to its library equivalent that we made above.
