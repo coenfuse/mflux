@@ -1,4 +1,5 @@
 // standard includes
+#include <csignal>
 #include <iostream>
 
 // internal includes
@@ -12,20 +13,74 @@
 
 
 
+// --------------------------------------------------------
+
+static std::unique_ptr<felidae::Mflux> p_mflux;
+
+
+// A simple wrapper to register all the signal handlers for
+// this program. Using lambda functions, their definition
+// is also mentioned here, given that they are within under
+// 10 lines of code.
+
+void setupSignalHandlers()
+{
+	// Abort termination triggered by abort call
+	signal(SIGABRT, [](int signal) {});
+
+
+	// Floating point exception
+	signal(SIGFPE, [](int signal) {});
+	
+
+	// Interrupt
+	signal(SIGINT, [](int signal)
+		{
+			p_mflux->stop();
+		}
+	);
+
+
+	// Illegal Instruction - Invalid function image
+	signal(SIGILL, [](int signal) {});
+
+
+	// Segment violation - Writing to illegal memory location
+	signal(SIGSEGV, [](int signal) {});
+
+
+	// Software termination signal from kill
+	signal(SIGTERM, [](int signal) {});
+
+
+	// Ctrl-Break sequence
+	signal(SIGBREAK, [](int signal) {});
+}
+
+
+
 int main(int argc, char* argv[])
 {
-    felidae::ERC error_code = felidae::ERC::SUCCESS;
+    auto status = felidae::ERC::SUCCESS;
     
-    std::unique_ptr<felidae::Mflux> p_Mflux = std::make_unique<felidae::Mflux>();
-    try
-    {
-        error_code = p_Mflux->run(argc, argv);
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << fmt::format("Exception in {}", e.what());
-        error_code = felidae::ERC::EXCEPTION;
-    }
+    p_mflux = std::make_unique<felidae::Mflux>();
 
-    return static_cast<uint16_t>(error_code);
+	if (p_mflux == nullptr)
+		status = felidae::ERC::MEMORY_ALLOCATION_FAILED;
+    
+	if (status == felidae::ERC::SUCCESS)
+	{
+		try
+		{
+			setupSignalHandlers();
+			status = p_mflux->run(argc, argv);
+		}
+		catch (std::exception &e)
+		{
+			std::cerr << fmt::format("Exception {}", e.what());
+			status = felidae::ERC::EXCEPTION;
+		}
+	}
+
+	return static_cast<uint16_t>(status);
 }

@@ -27,7 +27,7 @@ namespace felidae
         Mflux(void);
         ~Mflux(void);
         ERC run(int argc, char* argv[]);
-
+        void stop();
         
     private:
 
@@ -46,5 +46,7 @@ namespace felidae
 
         std::shared_ptr<felidae::Configurator> m_config = nullptr;
         std::unique_ptr<felidae::Engine> m_engine = nullptr;
+
+        bool m_signalled_stop = false;
     };
 }

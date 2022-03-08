@@ -54,7 +54,7 @@ namespace felidae
             status = init_logging();
 
         if (status == ERC::SUCCESS)
-            spdlog::info("Starting {}", m_name);
+            spdlog::info("{} starting", m_name);
 
         if (status == ERC::SUCCESS)
             m_engine = std::make_unique<felidae::Engine>();
@@ -67,17 +67,28 @@ namespace felidae
 
         if (status == ERC::SUCCESS)
         {
-            while (m_engine->is_running())
+            spdlog::info("{} running", m_name);
+            
+            while (m_engine->is_running() && !m_signalled_stop)
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+            spdlog::info("{} stopping", m_name);
         }
 
         if (status == ERC::SUCCESS)
             status = m_engine->stop();
 
         if (status == ERC::SUCCESS)
-            spdlog::info("Stopping {}", m_name);
+            spdlog::info("{} stopped", m_name);
 
         return status;
+    }
+
+
+    void Mflux::stop()
+    {
+        spdlog::debug("SIGINT received");
+        this->m_signalled_stop = true;
     }
 
 
