@@ -7,7 +7,7 @@
 #include "mflux/mflux.h"
 
 // module includes
-// ..
+#include "configurator/configurator.h"
 
 // third party includes
 #include "CLI/CLI.hpp"
@@ -104,6 +104,9 @@ namespace felidae
             fmt::print("{} v{} (c) 2022-2023 Felidae Systems Inc.\n\n", m_name, m_version);
             fmt::print(parser.help());
         }
+
+        // TODO : Perform additional checks for length of string, nullptr, exception etc.
+        // m_config = std::make_shared<felidae::Configurator>(m_config_file);
 
         return status;
     }

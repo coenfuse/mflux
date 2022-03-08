@@ -12,7 +12,7 @@
 // forward references
 namespace felidae
 {
-
+    class Configurator;
     class Engine;
 }
 
@@ -46,6 +46,7 @@ namespace felidae
         std::string m_version = app_VERSION;
         std::string m_description = app_DESCRIPTION;
 
+        std::shared_ptr<felidae::Configurator> m_config = nullptr;
         std::unique_ptr<felidae::Engine> m_engine = nullptr;
     };
 }
