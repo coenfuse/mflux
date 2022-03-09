@@ -5,11 +5,11 @@ set(PROJECT_HDRS "include/minix/minix.h")
 set(PROJECT_SRCS "src/minix.cpp")
 
 # Setting up target
-project("minix" VERSION 0.1.0.2)
+project("minix" VERSION 0.1.0)
 
 # Setting up target specific options
-option(MINIX_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
-option(MINIX_BUILD_DOCS "Generate doxygen based docs for ${PROJECT_NAME}" OFF)
+# option(MINIX_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
+# option(MINIX_BUILD_DOCS "Generate doxygen based docs for ${PROJECT_NAME}" OFF)
 
 # Logging target build info
 message(STATUS "Generating ${PROJECT_NAME} v${PROJECT_VERSION}")
@@ -36,7 +36,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${NAMESPACE}::mqtt)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
 
 # Building unit tests for target if enabled
-if(MINIX_BUILD_TESTS OR BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
+# if(MINIX_BUILD_TESTS OR BUILD_TESTS)
+#     enable_testing()
+#     add_subdirectory(tests)
+# endif()

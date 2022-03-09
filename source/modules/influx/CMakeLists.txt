@@ -5,11 +5,11 @@ set(PROJECT_HDRS "include/influx/client.h" "include/influx/message.h")
 set(PROJECT_SRCS "src/client.cpp")
 
 # Setting up target
-project("influx" VERSION 0.1.0.2)
+project("influx" VERSION 0.1.0)
 
 # Setting up target specific options
-option(INFLUX_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
-option(INFLUX_BUILD_DOCS "Generate doxygen based docs for ${PROJECT_NAME}" OFF)
+# option(INFLUX_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
+# option(INFLUX_BUILD_DOCS "Generate doxygen based docs for ${PROJECT_NAME}" OFF)
 
 # Logging target build info
 message(STATUS "Generating ${PROJECT_NAME} v${PROJECT_VERSION}")
@@ -35,7 +35,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
 # cinflux
 
 # Building unit tests for target if enabled
-if(INFLUX_BUILD_TESTS OR BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
+# if(INFLUX_BUILD_TESTS OR BUILD_TESTS)
+#     enable_testing()
+#     add_subdirectory(tests)
+# endif()

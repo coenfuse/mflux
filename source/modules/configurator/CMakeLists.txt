@@ -5,7 +5,7 @@ set(PROJECT_HDRS "include/configurator/configurator.h")
 set(PROJECT_SRCS "src/configurator.cpp")
 
 # Setting up target
-project("configurator" VERSION 0.1.0.2)
+project("configurator" VERSION 1.0.0)
 
 # Setting up target specific options
 # option(CONF_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)

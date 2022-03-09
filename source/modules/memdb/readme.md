@@ -1,28 +1,12 @@
-# README #
+# MemDB #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### What is this module for? ###
 
-### What is this repository for? ###
-
-* Quick summary
-* Version
+* In-memory key-value database featuring basic push-pop operations. 
+* In Mflux it is used as a buffer for load balancing asynchronous operation of MQTT and Influx.
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+* This module doesn't need any special setup operation as it will be automatically generated and built by the workspace it is configured in.
+* To build tests specifically to this module, use the cmake option `-DMEMDB_BUILD_TESTS=ON` 
+* Or have the tests build alongwith all other modules if you use the option `-DBUILD_TESTS=ON`
