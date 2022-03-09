@@ -14,62 +14,52 @@
 
 namespace felidae
 {
-	namespace influx
-	{
-		MemDB::MemDB(void)
-        {}
+    MemDB::MemDB(void)
+    {}
 
-		MemDB::~MemDB(void)
-        {}
+    MemDB::~MemDB(void)
+    {}
 
 
-		ERC MemDB::push()
-        {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
-        }
+    ERC MemDB::push(std::string column_name)
+    {
+        auto status = ERC::SUCCESS;
+        // ..
+        return status;
+    }
 
-		ERC MemDB::pop()
-        {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
-        }
+    ERC MemDB::pop(std::string column_name)
+    {
+        auto status = ERC::SUCCESS;
+        // ..
+        return status;
+    }
 
-		ERC MemDB::fetch()
-        {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
-        }
+    bool MemDB::is_empty(void)
+    {
+        auto status = true;
+        // ..
+        return status;
+    }
 
-		bool MemDB::isEmpty()
-        {
-            auto status = true;
-            // ..
-            return status;
-        }
-        
-		bool MemDB::isEmpty(std::string key)
-        {
-            auto status = true;
-            // ..
-            return status;
-        }
-        
-		ERC MemDB::purge()
-        {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
-        }
-        
-		ERC MemDB::drop()
-        {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
-        }
-	}
+    bool MemDB::is_empty(std::string column_name)
+    {
+        auto status = true;
+        // ..
+        return status;
+    }
+
+    ERC MemDB::purge(std::string column_name)
+    {
+        auto status = ERC::SUCCESS;
+        // ..
+        return status;
+    }
+
+    ERC MemDB::drop(void)
+    {
+        auto status = ERC::SUCCESS;
+        // ..
+        return status;
+    }
 }

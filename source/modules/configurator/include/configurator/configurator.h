@@ -117,16 +117,16 @@ namespace felidae
 
 
         // Buffer name to store incoming MQTT messages into
-        std::string get_mqtt_inbox_name(void);
+        static std::string get_mqtt_inbox_name(void);
 
         // Buffer name to store outgoing MQTT messages into
-        std::string get_mqtt_outbox_name(void);
+        static std::string get_mqtt_outbox_name(void);
 
-        // Buffer to store incoming InfluxDB message into
-        std::string get_influx_inbox_name(void);
+        // Buffer to store incoming InfluxDB messages into
+        static std::string get_influx_inbox_name(void);
 
-        // Buffer to store outgoing InfluxDB message into
-        std::string get_influx_outbox_name(void);
+        // Buffer to store outgoing InfluxDB messages into
+        static std::string get_influx_outbox_name(void);
 
     private:
 

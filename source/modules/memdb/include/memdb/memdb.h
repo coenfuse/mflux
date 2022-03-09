@@ -21,22 +21,29 @@
 
 namespace felidae
 {
-	namespace influx
+	class MemDB
 	{
-		class MemDB
-		{
-		public:
+	public:
 			
-			MemDB(void);
-			~MemDB(void);
+		MemDB(void);
+		~MemDB(void);
 
-			ERC push();
-		    ERC pop();
-		    ERC fetch();
-		    bool isEmpty();			            // The database
-		    bool isEmpty(std::string key);		// A column
-		    ERC purge();				        // A column
-		    ERC drop();				            // The database
-		};
-	}
+		// Push a DB item into a DB column
+		ERC push(std::string column_name);
+		
+		// Pop a DB item from a DB column
+		ERC pop(std::string column_name);
+
+		// Check if the database is empty
+		bool is_empty(void);
+
+		// Check if a DB column is empty
+		bool is_empty(std::string column_name);
+
+		// Purge a database column
+		ERC purge(std::string column_name);
+
+		// Drop the database
+		ERC drop(void);
+	};
 }
