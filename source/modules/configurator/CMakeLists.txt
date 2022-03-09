@@ -30,8 +30,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/i
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/source/thirdparty/nlohmann-json/include/")
 
-# [BUG : Not Working] Setup public API for this library
-# set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/${PROJECT_NAME}.h")
+# Linking target with modules it is dependent on
+target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::mqtt)
 
 # Linking target with its third-party dependencies
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)

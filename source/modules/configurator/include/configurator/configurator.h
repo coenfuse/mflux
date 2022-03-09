@@ -7,18 +7,18 @@
 #include <string>
 #include <vector>
 
-// other includes
+// internal includes
+// ..
+
+// module includes
 #include "errorcodes/errorcodes.h"
+#include "mqtt/subscription.h"
+
+// thirdparty includes
 #include "json/json.hpp"
 
 // forward references
-namespace felidae
-{
-    namespace MQTT
-    {
-        class Message;
-    }
-}
+// ..
 
 
 
@@ -51,7 +51,7 @@ namespace felidae
         uint16_t get_mqtt_timeout_s(void);
         std::string get_mqtt_username(void);
         std::string get_mqtt_password(void);
-        std::vector<MQTT::Message> get_mqtt_sub_list(void);
+        std::vector<mqtt::Subscription> get_mqtt_sub_list(void);
 
         // Influx configurations
         bool is_influx_on(void);

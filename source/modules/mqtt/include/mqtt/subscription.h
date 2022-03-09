@@ -2,13 +2,14 @@
 #pragma once
 
 // standard includes
+#include <cstdint>
 #include <string>
 
 // internal includes
 // ..
 
 // module includes
-#include "errorcodes/errorcodes.h"
+// ..
 
 // thirdparty includes
 // ..
@@ -22,15 +23,11 @@ namespace felidae
 {
 	namespace mqtt
 	{
-		class Message
-		{
-		public:
-
-			Message(void){}
-			~Message(void){}
-
-			std::string dump(){}
-			ERC parse(std::string msg){}
-		};
+		struct Subscription
+        {
+            std::string topic;
+            uint8_t qos;
+            bool retain;
+        };
 	}
 }

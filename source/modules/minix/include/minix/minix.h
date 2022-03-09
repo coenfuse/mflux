@@ -4,15 +4,19 @@
 // standard includes
 // ..
 
+// internal includes
+// ..
+
 // module includes
 #include "errorcodes/errorcodes.h"
+#include "influx/message.h"
+#include "mqtt/message.h"
 
 // thirdparty includes
 // ..
 
 // forward references
-// influx message
-// mqtt message
+// ..
 
 
 

@@ -1,7 +1,7 @@
 # This CMakeLists contain all the required build info for generating this target
 
 # Adding directories that contain source files
-set(PROJECT_HDRS "include/mqtt/client.h" "include/mqtt/message.h")
+set(PROJECT_HDRS "include/mqtt/client.h" "include/mqtt/message.h" "include/mqtt/subscription.h")
 set(PROJECT_SRCS "src/client.cpp")
 
 # Setting up target

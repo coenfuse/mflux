@@ -10,9 +10,6 @@
 // thirdparty includes
 // ..
 
-// forward references
-// ..
-
 
 
 namespace felidae

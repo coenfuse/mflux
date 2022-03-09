@@ -9,7 +9,6 @@
 
 // module includes
 #include "errorcodes/errorcodes.h"
-// mqtt message
 
 // third party includes
 #include "spdlog/spdlog.h"
@@ -148,9 +147,9 @@ namespace felidae
         return m_config_json["mqtt_password"];
     }
     
-    std::vector<MQTT::Message> Configurator::get_mqtt_sub_list(void)
+    std::vector<mqtt::Subscription> Configurator::get_mqtt_sub_list(void)
     {
-        std::vector<MQTT::Message> sub_list;
+        std::vector<mqtt::Subscription> sub_list;
 
         // TODO : Will be implemented once MQTT module is developed
 

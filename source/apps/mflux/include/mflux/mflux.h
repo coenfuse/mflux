@@ -1,4 +1,4 @@
-// // preprocessor flags
+// preprocessor flags
 #pragma once
 
 // standard includes
@@ -6,14 +6,18 @@
 #include <memory>
 
 // internal includes
+#include "app-config.h"
 #include "engine/engine.h"
 
 // module includes
 #include "configurator/configurator.h"
 #include "errorcodes/errorcodes.h"
 
-// other includes
-#include "app-config.h"
+// thirdparty includes
+// ..
+
+// forward references
+// ..
 
 
 
