@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 		try
 		{
 			setupSignalHandlers();
-			status = p_mflux->run(argc, argv);
+			status = p_mflux->start(argc, argv);
 		}
 		catch (std::exception &e)
 		{

@@ -20,21 +20,6 @@
 
 namespace felidae
 {
-    class Engine
-    {
-    public:
-        Engine(){}
-        ~Engine(){}
-
-        ERC start(void) { return ERC::SUCCESS; }
-        ERC stop(void) { return ERC::SUCCESS; }
-        bool is_running(void) { return false; }
-    };
-}
-
-
-namespace felidae
-{
     Mflux::Mflux(void)
     {}
 
@@ -43,7 +28,7 @@ namespace felidae
     {}
 
 
-    ERC Mflux::run(int argc, char* argv[])
+    ERC Mflux::start(int argc, char* argv[])
     {
         ERC status = ERC::SUCCESS;
 
@@ -85,7 +70,7 @@ namespace felidae
     }
 
 
-    void Mflux::stop()
+    void Mflux::stop(void)
     {
         spdlog::debug("SIGINT received");
         this->m_signalled_stop = true;

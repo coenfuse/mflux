@@ -5,16 +5,15 @@
 #include <string>
 #include <memory>
 
-// other includes
-#include "app-config.h"
+// internal includes
+#include "engine/engine.h"
+
+// module includes
+#include "configurator/configurator.h"
 #include "errorcodes/errorcodes.h"
 
-// forward references
-namespace felidae
-{
-    class Configurator;
-    class Engine;
-}
+// other includes
+#include "app-config.h"
 
 
 
@@ -26,14 +25,13 @@ namespace felidae
 
         Mflux(void);
         ~Mflux(void);
-        ERC run(int argc, char* argv[]);
-        void stop();
+        ERC start(int argc, char* argv[]);
+        void stop(void);
         
     private:
 
         ERC process_command_line(int argc, char* argv[]);
         ERC init_logging(void);
-
 
     private:
 
