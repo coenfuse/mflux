@@ -1,0 +1,192 @@
+// ---------------------------------------
+// mflux.config.jsonc
+// Configuration for Mflux application
+// ---------------------------------------
+
+{
+    // Logging level codes
+    // TRACE    : 0   Most detailed
+    // DEBUG    : 1
+    // INFO     : 2
+    // WARNING  : 3
+    // CRITICAL : 4
+    // ERROR    : 5   Most concise
+
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "log_dir": "../../out/logs",
+
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "log_level" : 1,
+
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "watchdog_on" : false,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "watchdog_timeout_s" : 60,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "watchdog_command" : "C:/mflux/bin/watchdog.exe",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "watchdog_log_level" : 2,
+
+    
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_on" : true,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_log_level" : 0,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_client_name" : "mqttc_mflux",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_is_clean" : true,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_host" : "localhost",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_port" : 1883,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_timeout_s" : 60,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_username" : "admin",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_password" : "12345",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "mqtt_sub_list" : 
+    [
+        {
+            "topic" : "mflux_debug",
+            "qos" : 0,
+            "retain" : false
+        },
+        {
+            "topic" : "BASSAI",
+            "qos" : 0,
+            "retain" : false
+        }
+    ],
+
+
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_on" : true,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_log_level" : 0,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_client_name" : "influxc_mflux",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_host" : "192.168.1.1",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_port" : 8086,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_timeout_s" : 60,
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_org_name" : "felidae",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_db_name" : "mflux",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_db_username" : "admin",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_db_password" : "12345",
+    
+    // Config Name
+    // -----------------------------------
+    // Config Description
+    // Config example
+    "influx_db_auth_key" : "0u4tQrkNIqYcSvaSFRQD"
+}
