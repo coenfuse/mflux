@@ -27,15 +27,15 @@ namespace felidae
 	{}
 
 
-	ERC Core::start(std::shared_ptr<MemDB> p_db)
+	ERC Core::start(std::shared_ptr<MemDB> p_buffer)
 	{
 		auto status = ERC::SUCCESS;
 		
 		if (!this->is_running())
 		{
-			m_pDb = p_db;
+			m_pBuffer = p_buffer;
 
-			if (m_pDb == nullptr)
+			if (m_pBuffer == nullptr)
 				status = ERC::NULLPTR_RECV;
 
 			if (status == ERC::SUCCESS)
@@ -84,21 +84,27 @@ namespace felidae
 
 		while(!m_signalled_stop)
 		{
-			if (!m_pDb->is_empty(inbox_name))
+			// wait for a message
+			if (!m_pBuffer->is_empty(inbox_name))
 			{
-				status = m_pDb->pop(inbox_name, dbitem);
+				// Pull the DBitem from the inbox buffer
+				status = m_pBuffer->pop(inbox_name, dbitem);
 
+				// Get the message from the DBitem
 				if(status == ERC::SUCCESS)
 					status = dbitem.get<mqtt::Message>(mqtt_msg);
 
+				// Convert the message to an influx message
 				if (status == ERC::SUCCESS)
 					status = minix::get_influx_msg_from(mqtt_msg, influx_msg);
 
+				// Overwrite the DBitem with the influx message
 				if (status == ERC::SUCCESS)
 					status = dbitem.set<influx::Message>(influx_msg);
 
+				// Push the DBitem to the outbox buffer
 				if (status == ERC::SUCCESS)
-					status = m_pDb->push(outbox_name, dbitem);
+					status = m_pBuffer->push(outbox_name, dbitem);
 
 				// if (status != ERC::SUCCESS)
 				//	 m_pDb->push(inbox_name, dbitem);

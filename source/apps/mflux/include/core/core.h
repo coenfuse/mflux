@@ -48,7 +48,7 @@ namespace felidae
 
 	private:
 
-		std::shared_ptr<felidae::MemDB> m_pDb = nullptr;
+		std::shared_ptr<felidae::MemDB> m_pBuffer = nullptr;
 		
 		std::atomic_bool m_signalled_stop = true;
 		std::thread m_worker;

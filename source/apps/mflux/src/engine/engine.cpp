@@ -21,7 +21,7 @@ namespace felidae
 		m_pMqttc = std::make_unique<mqtt::Client>();
 		m_pCore = std::make_unique<Core>();
 
-		m_pDb = std::make_shared<MemDB>();
+		m_pBuffer = std::make_shared<MemDB>();
 	}
 
 	Engine::~Engine(void)
@@ -34,7 +34,7 @@ namespace felidae
 
 		if (!this->is_running())
 		{
-			if ((p_config == nullptr) || (m_pCore == nullptr) || (m_pDb == nullptr) || (m_pInfluxc == nullptr) || (m_pMqttc == nullptr))
+			if ((p_config == nullptr) || (m_pCore == nullptr) || (m_pBuffer == nullptr) || (m_pInfluxc == nullptr) || (m_pMqttc == nullptr))
 				status = ERC::MEMORY_ALLOCATION_FAILED;
 
 			if (status == ERC::SUCCESS)
@@ -44,7 +44,7 @@ namespace felidae
 				status = m_pInfluxc->start_service(p_config);
 
 			if (status == ERC::SUCCESS)
-				status = m_pCore->start(m_pDb);
+				status = m_pCore->start(m_pBuffer);
 		}
 
 		return status;
@@ -70,6 +70,8 @@ namespace felidae
 
 	bool Engine::is_running(void)
 	{
+		// TODO : The result should be the sum of the running 
+		// status of the influx and mqtt clients as well as the core.
 		return m_pCore->is_running();
 	}
 }
