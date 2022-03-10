@@ -4,6 +4,7 @@
 
 // standard includes
 #include <map>
+#include <queue>
 #include <string>
 #include <variant>
 
@@ -105,6 +106,12 @@ namespace felidae
 
 	private:
 
-		std::map<std::string, DBitem> m_db;
+		bool column_exists(std::string column_name);
+
+	private:
+
+		using data_column_t = std::queue<DBitem>;
+
+		std::map<std::string, data_column_t> m_db;
 	};
 }
