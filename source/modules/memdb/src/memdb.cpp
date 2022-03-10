@@ -1,17 +1,20 @@
 // standard includes
 // ..
 
+
 // internal includes
 #include "memdb/memdb.h"
 
+
 // module includes
 // ..
+
 
 // thirdparty includes
 // ..
 
 
-// TODO : Implement thread safe operations
+
 
 namespace felidae
 {
@@ -30,11 +33,13 @@ namespace felidae
         
         if (column_exists(column_name))
         {
-            // TODO : Lock the thread
-            
+            std::lock_guard<std::mutex> db_lock(m_mtx);
             m_db.at(column_name).push(item);
 
-            // TODO : Unlock the thread
+            // lock_guard automatically gets released
+            // once we go out of its declaration scope.
+            // Why not use pure mutex? Check
+            // www.modernescpp.com/index.php/prefer-locks-to-mutexes
         }
 
         return status;
@@ -46,12 +51,10 @@ namespace felidae
         
         if (column_exists(column_name))
         {
-            // TODO : Lock the thread
+            std::lock_guard<std::mutex> db_lock(m_mtx);
             
             pop_into = m_db.at(column_name).front();
             m_db.at(column_name).pop();
-
-            // TODO : Unlock the thread
         }
 
         return status;
@@ -64,7 +67,6 @@ namespace felidae
 
     bool MemDB::is_empty(std::string column_name)
     {
-        // Check existence of column and then check if it's empty
         if (column_exists(column_name))
             return m_db.at(column_name).empty();
         
@@ -74,21 +76,23 @@ namespace felidae
 
     ERC MemDB::purge(std::string column_name)
     {
-        auto status = ERC::SUCCESS;
-        
         if (column_exists(column_name))
         {
+            std::lock_guard<std::mutex> db_lock(m_mtx);
+
             while (!m_db.at(column_name).empty())
                 m_db.at(column_name).pop();
         }
 
-        return status;
+        // No column exists to purge, logically successful
+        return ERC::SUCCESS;
     }
 
     ERC MemDB::drop(void)
     {
         auto status = ERC::SUCCESS;
         
+        std::lock_guard<std::mutex> db_lock(m_mtx);
         m_db.clear();
 
         if (!m_db.empty())

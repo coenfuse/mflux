@@ -4,6 +4,7 @@
 
 // standard includes
 #include <map>
+#include <mutex>
 #include <queue>
 #include <string>
 #include <variant>
@@ -110,8 +111,9 @@ namespace felidae
 
 	private:
 
-		using data_column_t = std::queue<DBitem>;
+		std::mutex m_mtx;
 
+		using data_column_t = std::queue<DBitem>;
 		std::map<std::string, data_column_t> m_db;
 	};
 }
