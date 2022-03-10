@@ -49,7 +49,6 @@ namespace felidae
 		std::unique_ptr<influx::Client> m_pInfluxc = nullptr;
 
 		// These object pointers will be updated and shared further
-		std::shared_ptr<Configurator> m_pConfig = nullptr;
 		std::shared_ptr<MemDB> m_pDb = nullptr;
 	};
 }

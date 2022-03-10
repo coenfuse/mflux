@@ -50,7 +50,7 @@ namespace felidae
 
 		std::shared_ptr<felidae::MemDB> m_pDb = nullptr;
 		
-		std::atomic<bool> m_running = false;
+		std::atomic_bool m_signalled_stop = true;
 		std::thread m_worker;
 	};
 }

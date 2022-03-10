@@ -10,6 +10,7 @@
 
 // third party includes
 #include "fmt/format.h"
+#include "spdlog/spdlog.h"
 
 
 
@@ -36,6 +37,7 @@ void setupSignalHandlers()
 	// Interrupt
 	signal(SIGINT, [](int signal)
 		{
+			spdlog::info("SIGINT received");
 			p_mflux->stop();
 		}
 	);

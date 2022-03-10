@@ -72,7 +72,6 @@ namespace felidae
 
     void Mflux::stop(void)
     {
-        spdlog::debug("SIGINT received");
         this->m_signalled_stop = true;
     }
 

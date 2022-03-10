@@ -2,12 +2,13 @@
 #pragma once
 
 // standard includes
-// ..
+#include <memory>
 
 // internal includes
 // ..
 
 // module includes
+#include "configurator/configurator.h"
 #include "errorcodes/errorcodes.h"
 
 // thirdparty includes
@@ -37,7 +38,7 @@ namespace felidae
 			ERC subscribe(void);
 			ERC unsubscribe(void);
 
-			ERC start_service(void);
+			ERC start_service(std::shared_ptr<Configurator> p_config);
 			ERC stop_service(void);
 			bool is_running(void);
 		};

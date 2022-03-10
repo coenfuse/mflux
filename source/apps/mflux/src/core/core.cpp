@@ -20,8 +20,6 @@
 
 namespace felidae
 {
-	void s_job(std::shared_ptr<MemDB> db);
-
 	Core::Core()
 	{}
 
@@ -57,7 +55,7 @@ namespace felidae
 		
 		if (this->is_running())
 		{
-			m_running = false;
+			m_signalled_stop.exchange(true);
 			m_worker.join();
 		}
 
@@ -78,9 +76,9 @@ namespace felidae
 		auto inbox_name = Configurator::get_mqtt_inbox_name();
 		auto outbox_name = Configurator::get_influx_outbox_name();
 
-		m_running = true;
+		m_signalled_stop.exchange(false);
 
-		while(m_running)
+		while(!m_signalled_stop)
 		{
 			if (!m_pDb->is_empty(inbox_name))
 			{

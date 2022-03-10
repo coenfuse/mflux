@@ -34,16 +34,14 @@ namespace felidae
 
 		if (!this->is_running())
 		{
-			m_pConfig = p_config;
-
-			if ((m_pConfig == nullptr) || (m_pCore == nullptr) || (m_pDb == nullptr) || (m_pInfluxc == nullptr) || (m_pMqttc == nullptr))
+			if ((p_config == nullptr) || (m_pCore == nullptr) || (m_pDb == nullptr) || (m_pInfluxc == nullptr) || (m_pMqttc == nullptr))
 				status = ERC::MEMORY_ALLOCATION_FAILED;
 
 			if (status == ERC::SUCCESS)
-				status = m_pMqttc->start_service();
+				status = m_pMqttc->start_service(p_config);
 
 			if (status == ERC::SUCCESS)
-				status = m_pInfluxc->start_service();
+				status = m_pInfluxc->start_service(p_config);
 
 			if (status == ERC::SUCCESS)
 				status = m_pCore->start(m_pDb);
@@ -64,7 +62,7 @@ namespace felidae
 				status = m_pInfluxc->stop_service();
 
 			if (status == ERC::SUCCESS)
-				status = m_pMqttc->start_service();
+				status = m_pMqttc->stop_service();
 		}
 
 		return status;
