@@ -24,8 +24,8 @@ namespace felidae
 {
     namespace minix
     {
-        ERC get_influx_msg(void);
+        ERC get_influx_msg_from(mqtt::Message this_msg, influx::Message& into_this);
 
-        ERC get_mqtt_msg(void);
+        ERC get_mqtt_msg_from(influx::Message this_msg, mqtt::Message& into_this);
     }
 }

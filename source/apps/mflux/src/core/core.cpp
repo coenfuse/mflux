@@ -76,19 +76,32 @@ namespace felidae
 		auto inbox_name = Configurator::get_mqtt_inbox_name();
 		auto outbox_name = Configurator::get_influx_outbox_name();
 
+		DBitem dbitem;
+		mqtt::Message mqtt_msg;
+		influx::Message influx_msg;
+
 		m_signalled_stop.exchange(false);
 
 		while(!m_signalled_stop)
 		{
 			if (!m_pDb->is_empty(inbox_name))
 			{
-				status = m_pDb->pop(inbox_name);
+				status = m_pDb->pop(inbox_name, dbitem);
+
+				if(status == ERC::SUCCESS)
+					status = dbitem.get<mqtt::Message>(mqtt_msg);
 
 				if (status == ERC::SUCCESS)
-					status = minix::get_influx_msg();
+					status = minix::get_influx_msg_from(mqtt_msg, influx_msg);
 
 				if (status == ERC::SUCCESS)
-					status = m_pDb->push(outbox_name);
+					status = dbitem.set<influx::Message>(influx_msg);
+
+				if (status == ERC::SUCCESS)
+					status = m_pDb->push(outbox_name, dbitem);
+
+				// if (status != ERC::SUCCESS)
+				//	 m_pDb->push(inbox_name, dbitem);
 			}
 		}
 	}

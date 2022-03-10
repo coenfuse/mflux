@@ -21,14 +21,14 @@ namespace felidae
     {}
 
 
-    ERC MemDB::push(std::string column_name)
+    ERC MemDB::push(std::string column_name, DBitem item)
     {
         auto status = ERC::SUCCESS;
         // ..
         return status;
     }
 
-    ERC MemDB::pop(std::string column_name)
+    ERC MemDB::pop(std::string column_name, DBitem& pop_into)
     {
         auto status = ERC::SUCCESS;
         // ..

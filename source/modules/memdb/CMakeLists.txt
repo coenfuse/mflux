@@ -29,6 +29,10 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES 
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
 
+# Linking target with libraries it is dependent on
+target_link_libraries(${PROJECT_NAME} PRIVATE ${NAMESPACE}::influx)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${NAMESPACE}::mqtt)
+
 # Linking target with its third-party dependencies
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
