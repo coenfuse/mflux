@@ -48,7 +48,11 @@ namespace felidae
             std::lock_guard<std::mutex> db_lock(m_mtx);
             m_db.insert(new_column);
 
-            // Now insert the data into this new column
+            // Now insert the data into this new column.
+            // Didn't use this->push(column_name, item)
+            // as that risks creating a nested lock on
+            // the database. Which eventually leads to
+            // a confirmed deadlock.
             m_db.at(column_name).push(item);
         }
 
