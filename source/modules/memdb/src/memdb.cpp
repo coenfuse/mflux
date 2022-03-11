@@ -41,6 +41,16 @@ namespace felidae
             // Why not use pure mutex? Check
             // www.modernescpp.com/index.php/prefer-locks-to-mutexes
         }
+        else
+        {
+            auto new_column = std::pair<std::string, data_column_t>(column_name, data_column_t());
+
+            std::lock_guard<std::mutex> db_lock(m_mtx);
+            m_db.insert(new_column);
+
+            // Now insert the data into this new column
+            m_db.at(column_name).push(item);
+        }
 
         return status;
     }
