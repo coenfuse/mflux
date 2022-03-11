@@ -144,13 +144,13 @@ namespace felidae
 				mqtt_msg.set_topic("BASSAI");
 				mqtt_msg.set_qos(rand() % 3);
 				mqtt_msg.set_to_retain(rand() % 2);
-				mqtt_msg.set_payload(fmt::format("MQTT msg ID {}\n", rand() % 99));
+				mqtt_msg.set_payload(fmt::format("{}", rand() % 99));
 
 				dbitem.set<Message>(mqtt_msg);
 
 				m_pBuffer->push(buffer_name, dbitem);
 				
-				fmt::print("Sent {} {}", mqtt_msg.get_topic(), mqtt_msg.get_payload());
+				fmt::print("Sent msg with topic: {} payload: {} qos: {} retention: {}\n", mqtt_msg.get_topic(), mqtt_msg.get_payload(), mqtt_msg.get_qos(), mqtt_msg.get_to_retain());
 
 				// Take a break for a while
 				std::this_thread::sleep_for(std::chrono::seconds(3));
