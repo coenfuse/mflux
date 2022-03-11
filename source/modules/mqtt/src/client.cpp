@@ -97,8 +97,6 @@ namespace felidae
 
 				if (this->is_running())
 					status = ERC::SUCCESS;
-
-				fmt::print("MQTT service started\n");
 			}
 
 			return status;
@@ -150,7 +148,7 @@ namespace felidae
 
 				m_pBuffer->push(buffer_name, dbitem);
 				
-				fmt::print("Sent msg with topic: {} payload: {} qos: {} retention: {}\n", mqtt_msg.get_topic(), mqtt_msg.get_payload(), mqtt_msg.get_qos(), mqtt_msg.get_to_retain());
+				fmt::print("\nSent     {} payload: {} qos: {} retention: {}\n", mqtt_msg.get_topic(), mqtt_msg.get_payload(), mqtt_msg.get_qos(), mqtt_msg.get_to_retain());
 
 				// Take a break for a while
 				std::this_thread::sleep_for(std::chrono::seconds(3));
