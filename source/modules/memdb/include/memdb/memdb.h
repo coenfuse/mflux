@@ -74,6 +74,7 @@ namespace felidae
 
 	private:
 		
+		// TODO : Remove this dependency on Influx and MQTT asap!
 		using value_t = std::variant<influx::Message, mqtt::Message>;
 		value_t m_value;
 	};

@@ -38,10 +38,10 @@ namespace felidae
 				status = ERC::MEMORY_ALLOCATION_FAILED;
 
 			if (status == ERC::SUCCESS)
-				status = m_pMqtt_sc->start_service(p_config);
+				status = m_pMqtt_sc->start_service(p_config, m_pBuffer);
 
 			if (status == ERC::SUCCESS)
-				status = m_pInflux_sc->start_service(p_config);
+				status = m_pInflux_sc->start_service(p_config, m_pBuffer);
 
 			if (status == ERC::SUCCESS)
 				status = m_pCore->start(m_pBuffer);

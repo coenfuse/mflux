@@ -10,6 +10,7 @@
 // module includes
 #include "configurator/configurator.h"
 #include "errorcodes/errorcodes.h"
+#include "memdb/memdb.h"
 
 // thirdparty includes
 // ..
@@ -39,7 +40,7 @@ namespace felidae
 			ERC pop(void);
 			ERC remove(void);
 
-			ERC start_service(std::shared_ptr<Configurator> p_config);
+			ERC start_service(std::shared_ptr<Configurator> p_config, std::shared_ptr<MemDB> p_buffer);
 			ERC stop_service(void);
 			bool is_running(void);
 		};

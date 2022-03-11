@@ -80,7 +80,7 @@ namespace felidae
 		}
 
 
-		ERC Client::start_service(std::shared_ptr<Configurator> p_config)
+		ERC Client::start_service(std::shared_ptr<Configurator> p_config, std::shared_ptr<MemDB> p_buffer)
 		{
 			auto status = ERC::SUCCESS;
 
