@@ -17,8 +17,8 @@ namespace felidae
 {
 	Engine::Engine(void)
 	{
-		m_pInfluxc = std::make_unique<influx::Client>();
-		m_pMqttc = std::make_unique<mqtt::Client>();
+		m_pInflux_sc = std::make_unique<influx::Client>();
+		m_pMqtt_sc = std::make_unique<mqtt::Client>();
 		m_pCore = std::make_unique<Core>();
 
 		m_pBuffer = std::make_shared<MemDB>();
@@ -34,14 +34,14 @@ namespace felidae
 
 		if (!this->is_running())
 		{
-			if ((p_config == nullptr) || (m_pCore == nullptr) || (m_pBuffer == nullptr) || (m_pInfluxc == nullptr) || (m_pMqttc == nullptr))
+			if ((p_config == nullptr) || (m_pCore == nullptr) || (m_pBuffer == nullptr) || (m_pInflux_sc == nullptr) || (m_pMqtt_sc == nullptr))
 				status = ERC::MEMORY_ALLOCATION_FAILED;
 
 			if (status == ERC::SUCCESS)
-				status = m_pMqttc->start_service(p_config);
+				status = m_pMqtt_sc->start_service(p_config);
 
 			if (status == ERC::SUCCESS)
-				status = m_pInfluxc->start_service(p_config);
+				status = m_pInflux_sc->start_service(p_config);
 
 			if (status == ERC::SUCCESS)
 				status = m_pCore->start(m_pBuffer);
@@ -59,10 +59,10 @@ namespace felidae
 			status = m_pCore->stop();
 
 			if (status == ERC::SUCCESS)
-				status = m_pInfluxc->stop_service();
+				status = m_pInflux_sc->stop_service();
 
 			if (status == ERC::SUCCESS)
-				status = m_pMqttc->stop_service();
+				status = m_pMqtt_sc->stop_service();
 		}
 
 		return status;
@@ -70,8 +70,8 @@ namespace felidae
 
 	bool Engine::is_running(void)
 	{
-		// TODO : The result should be the sum of the running 
-		// status of the influx and mqtt clients as well as the core.
-		return m_pCore->is_running();
+		// The engine is marked as running if any of its
+		// inner module is found to be running
+		return ( m_pInflux_sc->is_running() || m_pMqtt_sc->is_running() || m_pCore->is_running() );
 	}
 }

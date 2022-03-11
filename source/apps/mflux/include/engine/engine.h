@@ -45,8 +45,8 @@ namespace felidae
 
 		// The following object pointers will not be updated and shared further
 		std::unique_ptr<Core> m_pCore = nullptr;
-		std::unique_ptr<mqtt::Client> m_pMqttc = nullptr;
-		std::unique_ptr<influx::Client> m_pInfluxc = nullptr;
+		std::unique_ptr<mqtt::Client> m_pMqtt_sc = nullptr;
+		std::unique_ptr<influx::Client> m_pInflux_sc = nullptr;
 
 		// These object pointers will be updated and shared further
 		std::shared_ptr<MemDB> m_pBuffer = nullptr;
