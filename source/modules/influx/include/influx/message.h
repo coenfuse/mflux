@@ -102,6 +102,9 @@ namespace felidae
 			// TODO : Docs
 			// static inline ERC parse(std::string msg);
 
+			// Clear all existing measurements
+			inline void clear(void);
+
 		private:
 
 			std::string m_measure;
@@ -344,5 +347,14 @@ namespace felidae
 			return status;
 		}
 		*/
+
+
+		void Message::clear(void)
+		{
+			m_measure = "";
+			m_tags.clear();
+			m_fields.clear();
+			m_timestamp = std::to_string(std::chrono::system_clock::now().time_since_epoch() / std::chrono::microseconds(1));
+		}
 	}
 }
