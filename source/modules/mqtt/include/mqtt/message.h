@@ -22,25 +22,44 @@ namespace felidae
 {
 	namespace mqtt
 	{
+		// TODO : Docs
+
 		class Message
 		{
 		public:
 
 			Message(void){}
 			~Message(void){}
-
-			inline void set_topic(std::string topic);
-			inline void set_payload(std::string payload);
-			inline void set_qos(uint8_t qos);
-			inline void set_to_retain(bool retain_status);
-
+			
+			// TODO : Docs
 			inline std::string get_topic(void);
+
+			// TODO : Docs
+			inline void set_topic(std::string topic);
+			
+			// TODO : Docs
 			inline std::string get_payload(void);
+			
+			// TODO : Docs
+			inline void set_payload(std::string payload);
+
+			// TODO : Docs
 			inline uint8_t get_qos(void);
+
+			// TODO : Docs
+			inline void set_qos(uint8_t qos);
+			
+			// TODO : Docs
 			inline bool get_to_retain(void);
 
-			inline std::string dump();
-			inline ERC parse(std::string msg);
+			// TODO : Docs
+			inline void set_to_retain(bool retain_status);
+
+			// TODO : mqtt::Message::dump()
+			// inline std::string dump();
+			
+			// TODO : Docs
+			// static inline ERC parse(std::string msg);
 
 		private:
 
@@ -53,6 +72,8 @@ namespace felidae
 
 
 		// Definitions
+		// ------------------------------------------------------
+
 		void Message::set_topic(std::string topic)
 		{
 			if (!topic.empty())
@@ -99,22 +120,22 @@ namespace felidae
 			return m_to_retain;
 		}
 
+		/*
 		std::string Message::dump(void)
 		{
 			auto mqtt_msg_dump = "";
 
-			// TODO : MQTT msg serialization
-
 			return mqtt_msg_dump;
 		}
+		*/
 
+		/*
 		ERC Message::parse(std::string msg)
 		{
 			auto status = ERC::SUCCESS;
 
-			// TODO : MQTT msg deserialization
-
 			return status;
 		}
+		*/
 	}
 }
