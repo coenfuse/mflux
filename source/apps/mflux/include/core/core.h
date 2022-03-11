@@ -36,7 +36,7 @@ namespace felidae
 		Core();
 		~Core();
 
-		ERC start(std::shared_ptr<MemDB> p_db);
+		ERC start(std::shared_ptr<MemDB> p_buffer);
 		ERC stop(void);
 
 		bool is_running(void);
