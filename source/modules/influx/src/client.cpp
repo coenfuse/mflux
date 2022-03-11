@@ -107,6 +107,8 @@ namespace felidae
 
 				if (this->is_running())
 					status = ERC::SUCCESS;
+
+				fmt::print("Influx service started\n");
 			}
 
 			return status;
@@ -156,7 +158,7 @@ namespace felidae
 					if (status == ERC::SUCCESS)
 						status = dbitem.get<influx::Message>(influx_msg);
 
-					std::cout << "Received" << influx_msg.dump() << std::endl;
+					std::cout << "Received " << influx_msg.dump() << std::endl << std::endl;
 
 					// Send it to Influx DB
 					// if (status == ERC::SUCCESS)
