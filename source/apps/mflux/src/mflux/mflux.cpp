@@ -48,7 +48,7 @@ namespace felidae
             status = ERC::MEMORY_ALLOCATION_FAILED;
 
         if (status == ERC::SUCCESS)
-            status = m_engine->start();
+            status = m_engine->start(m_config);
 
         if (status == ERC::SUCCESS)
         {
@@ -72,7 +72,6 @@ namespace felidae
 
     void Mflux::stop(void)
     {
-        spdlog::debug("SIGINT received");
         this->m_signalled_stop = true;
     }
 

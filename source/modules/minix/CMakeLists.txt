@@ -5,7 +5,7 @@ set(PROJECT_HDRS "include/minix/minix.h")
 set(PROJECT_SRCS "src/minix.cpp")
 
 # Setting up target
-project("minix" VERSION 0.1.0)
+project("minix" VERSION 0.2.0)
 
 # Setting up target specific options
 # option(MINIX_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)

@@ -17,7 +17,8 @@ namespace felidae
         SUCCESS = 0,
         FAILURE,
         EXCEPTION,
-        MEMORY_ALLOCATION_FAILED
+        MEMORY_ALLOCATION_FAILED,
+        NULLPTR_RECV
 
         // Engine level error codes
         // ...

@@ -151,7 +151,16 @@ namespace felidae
     {
         std::vector<mqtt::Subscription> sub_list;
 
-        // TODO : Will be implemented once MQTT module is developed
+        for (auto each_sub : m_config_json["mqtt_sub_list"])
+        {
+            mqtt::Subscription new_sub;
+            
+            new_sub.set_topic(each_sub["topic"]);
+            new_sub.set_qos(each_sub["qos"]);
+            new_sub.set_to_retain(each_sub["retain"]);
+
+            sub_list.push_back(new_sub);
+        }
 
         return sub_list;
     }
