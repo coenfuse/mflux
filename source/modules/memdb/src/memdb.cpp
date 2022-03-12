@@ -1,75 +1,124 @@
 // standard includes
 // ..
 
+
 // internal includes
 #include "memdb/memdb.h"
 
+
 // module includes
 // ..
+
 
 // thirdparty includes
 // ..
 
 
 
+
 namespace felidae
 {
-	namespace influx
-	{
-		MemDB::MemDB(void)
-        {}
+    // PUBLIC METHODS
 
-		MemDB::~MemDB(void)
-        {}
+    MemDB::MemDB(void)
+    {}
+
+    MemDB::~MemDB(void)
+    {}
 
 
-		ERC MemDB::push()
-        {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
-        }
-
-		ERC MemDB::pop()
-        {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
-        }
-
-		ERC MemDB::fetch()
-        {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
-        }
-
-		bool MemDB::isEmpty()
-        {
-            auto status = true;
-            // ..
-            return status;
-        }
+    ERC MemDB::push(std::string column_name, DBitem item)
+    {
+        auto status = ERC::SUCCESS;
         
-		bool MemDB::isEmpty(std::string key)
+        if (column_exists(column_name))
         {
-            auto status = true;
-            // ..
-            return status;
+            std::lock_guard<std::mutex> db_lock(m_mtx);
+            m_db.at(column_name).push(item);
+
+            // lock_guard automatically gets released
+            // once we go out of its declaration scope.
+            // Why not use pure mutex? Check
+            // www.modernescpp.com/index.php/prefer-locks-to-mutexes
         }
+        else
+        {
+            auto new_column = std::pair<std::string, data_column_t>(column_name, data_column_t());
+
+            std::lock_guard<std::mutex> db_lock(m_mtx);
+            m_db.insert(new_column);
+
+            // Now insert the data into this new column.
+            // Didn't use this->push(column_name, item)
+            // as that risks creating a nested lock on
+            // the database. Which eventually leads to
+            // a confirmed deadlock.
+            m_db.at(column_name).push(item);
+        }
+
+        return status;
+    }
+
+    ERC MemDB::pop(std::string column_name, DBitem& pop_into)
+    {
+        auto status = ERC::SUCCESS;
         
-		ERC MemDB::purge()
+        if (column_exists(column_name))
         {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
+            std::lock_guard<std::mutex> db_lock(m_mtx);
+            
+            pop_into = m_db.at(column_name).front();
+            m_db.at(column_name).pop();
         }
+
+        return status;
+    }
+
+    bool MemDB::is_empty(void)
+    {
+        return m_db.empty();
+    }
+
+    bool MemDB::is_empty(std::string column_name)
+    {
+        if (column_exists(column_name))
+            return m_db.at(column_name).empty();
         
-		ERC MemDB::drop()
+        // No column exists, logically empty
+        return true;
+    }
+
+    ERC MemDB::purge(std::string column_name)
+    {
+        if (column_exists(column_name))
         {
-            auto status = ERC::SUCCESS;
-            // ..
-            return status;
+            std::lock_guard<std::mutex> db_lock(m_mtx);
+
+            while (!m_db.at(column_name).empty())
+                m_db.at(column_name).pop();
         }
-	}
+
+        // No column exists to purge, logically successful
+        return ERC::SUCCESS;
+    }
+
+    ERC MemDB::drop(void)
+    {
+        auto status = ERC::SUCCESS;
+        
+        std::lock_guard<std::mutex> db_lock(m_mtx);
+        m_db.clear();
+
+        if (!m_db.empty())
+            status = ERC::FAILURE;
+
+        return status;
+    }
+
+    // PRIVATE METHODS
+
+    bool MemDB::column_exists(std::string column_name)
+    {
+        return (m_db.find(column_name) != m_db.end());
+    }
 }

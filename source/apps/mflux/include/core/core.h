@@ -1,25 +1,36 @@
 // preprocessor flags
 #pragma once
 
+
 // standard includes
+#include <atomic>
 #include <memory>
+#include <thread>
+
 
 // internal includes
 // ..
 
+
 // module includes
 #include  "configurator/configurator.h"
 #include "errorcodes/errorcodes.h"
+#include "memdb/memdb.h"
+
 
 // third party includes
 // ..
+
 
 // forward references
 // ..
 
 
+
 namespace felidae
 {
+	// TODO : Docs
+
 	class Core
 	{
 	public:
@@ -27,17 +38,28 @@ namespace felidae
 		Core();
 		~Core();
 
-		ERC start(void);
+		// TODO : Docs
+		ERC start(std::shared_ptr<MemDB> p_buffer);
+		
+		// TODO : Docs
 		ERC stop(void);
 
+		// TODO : Docs
 		bool is_running(void);
 
 	private:
 
-		void m_job(void);
+		// TODO : Docs
+		static void s_job_wrapper(void* instance);
+		
+		// TODO : Docs
+		void m_actual_job(void);
 
 	private:
 
-		bool m_is_running = false;
+		std::shared_ptr<felidae::MemDB> m_pBuffer = nullptr;
+		
+		std::atomic_bool m_signalled_stop = true;
+		std::thread m_worker;
 	};
 }

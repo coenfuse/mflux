@@ -20,14 +20,21 @@ namespace felidae
 {
     namespace minix
     {
-        ERC get_influx_msg(void)
+        ERC get_influx_msg_from(mqtt::Message this_msg, influx::Message& into_this)
         {
             auto status = ERC::SUCCESS;
-            // ..
+
+            into_this.clear();
+            
+            into_this.set_measure(this_msg.get_topic());
+            into_this.add_tag_set("payload", this_msg.get_payload());
+            into_this.add_field_set("retention", this_msg.get_to_retain());
+            into_this.add_field_set("qos", (int64_t)this_msg.get_qos());
+            
             return status;
         }
 
-        ERC get_mqtt_msg(void)
+        ERC get_mqtt_msg_from(influx::Message this_msg, mqtt::Message& into_this)
         {
             auto status = ERC::SUCCESS;
             // ..

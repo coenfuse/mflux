@@ -1,18 +1,28 @@
 // preprocessor flags
 #pragma once
 
+
 // standard includes
 #include <map>
+#include <mutex>
+#include <queue>
 #include <string>
+#include <variant>
+
 
 // internal includes
 // ..
 
+
 // module includes
 #include "errorcodes/errorcodes.h"
+#include "influx/message.h"
+#include "mqtt/message.h"
+
 
 // thirdparty includes
 // ..
+
 
 // forward references
 // ..
@@ -21,22 +31,97 @@
 
 namespace felidae
 {
-	namespace influx
-	{
-		class MemDB
-		{
-		public:
-			
-			MemDB(void);
-			~MemDB(void);
 
-			ERC push();
-		    ERC pop();
-		    ERC fetch();
-		    bool isEmpty();			            // The database
-		    bool isEmpty(std::string key);		// A column
-		    ERC purge();				        // A column
-		    ERC drop();				            // The database
-		};
-	}
+	// TODO : Docs
+
+	class DBitem
+	{
+	public:
+
+		DBitem()
+		{}
+
+		~DBitem()
+		{}
+
+		// TODO : Docs
+		template <typename T>
+		inline ERC get(T& copy_into)
+		{
+			auto status = ERC::FAILURE;
+
+			if (std::holds_alternative<T>(m_value))
+			{
+				copy_into = std::get<T>(m_value);
+				status = ERC::SUCCESS;
+			}
+
+			return status;
+		}
+
+		// TODO : Docs
+		template <typename T>
+		inline ERC set(T value)
+		{
+			auto status = ERC::SUCCESS;
+
+			try
+			{
+				m_value = value;
+			}
+			catch (...)
+			{
+				status = ERC::EXCEPTION;
+			}
+
+			return status;
+		}
+
+	private:
+		
+		// TODO : Remove this dependency on Influx and MQTT asap!
+		using value_t = std::variant<influx::Message, mqtt::Message>;
+		value_t m_value;
+	};
+
+
+	// TODO : Docs
+
+	class MemDB
+	{
+	public:
+			
+		MemDB(void);
+		~MemDB(void);
+
+		/// Push a DB item into a DB column
+		ERC push(std::string column_name, DBitem item);
+		
+		/// Pop a DB item from a DB column
+		ERC pop(std::string column_name, DBitem& pop_into);
+
+		/// Check if the database is empty
+		bool is_empty(void);
+
+		/// Check if a DB column is empty
+		bool is_empty(std::string column_name);
+
+		/// Purge a database column
+		ERC purge(std::string column_name);
+
+		/// Drop the database
+		ERC drop(void);
+
+	private:
+
+		/// Checks whether a data colum already exists in the DB or not
+		bool column_exists(std::string column_name);
+
+	private:
+
+		std::mutex m_mtx;
+
+		using data_column_t = std::queue<DBitem>;
+		std::map<std::string, data_column_t> m_db;
+	};
 }
