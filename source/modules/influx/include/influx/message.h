@@ -2,11 +2,11 @@
 #pragma once
 
 // standard includes
-#include <chrono>						// Library to deal with data time
-#include <cstdint>						// Gives uint64_t and other data int types
-#include <map>							// Map data structure (key, value) pairs
-#include <string>						// String data structure
-#include <variant>						// Type-safe union data structure
+#include <chrono>								// Library to deal with data time
+#include <cstdint>								// Gives uint64_t and other data int types
+#include <map>									// Map data structure (key, value) pairs
+#include <string>								// String data structure
+#include <variant>								// Type-safe union data structure
 
 // internal includes
 // ..
@@ -26,24 +26,24 @@ namespace felidae
 {
 	namespace influx
 	{
-		// This data structure represents a common influx payload
-		// that is sent over or received from the Influx database
-		// A serialized payload looks like this:
-		// 
-		// cpu_z,sub_id=JTGM,user_id=TLM0201 celsius=73.97038159354763,cost=0.48445310567793615,precipitation=35.23103248356096 1642002847244005
-		//
-		// Here we have 4 parameters to consider, these are:
-		// Measure   : The name of the measurement, here it is 'cpu_z'
-		// Tag Set   : The tags of the measurement, here they are 'sub_id' and 'user_id'
-		// Field Set : The fields of the measurement, here they are 'celsius', 'cost' and 'precipitation'
-		// Timestamp : The timestamp when the measurement is made in microseconds since epoch.
-		//
-		// * Tag name and tag values are always a string
-		// * Field name is always a string but field value can be
-		//   a bool, an int, a decimal (double) or a string
-		// * Whenever an object of this data structure is made, it
-		//   assigns itself a timestamp in microseconds since epoch
-		//   However this can be overwritten using set_timestamp()
+		/// This data structure represents a common influx payload
+		/// that is sent over or received from the Influx database
+		/// A serialized payload looks like this:
+		/// 
+		/// cpu_z,sub_id=JTGM,user_id=TLM0201 celsius=73.97038159354763,cost=0.48445310567793615,precipitation=35.23103248356096 1642002847244005
+		///
+		/// Here we have 4 parameters to consider, these are:
+		/// Measure   : The name of the measurement, here it is 'cpu_z'
+		/// Tag Set   : The tags of the measurement, here they are 'sub_id' and 'user_id'
+		/// Field Set : The fields of the measurement, here they are 'celsius', 'cost' and 'precipitation'
+		/// Timestamp : The timestamp when the measurement is made in microseconds since epoch.
+		///
+		/// * Tag name and tag values are always a string
+		/// * Field name is always a string but field value can be
+		///   a bool, an int, a decimal (double) or a string
+		/// * Whenever an object of this data structure is made, it
+		///   assigns itself a timestamp in microseconds since epoch
+		///   However this can be overwritten using set_timestamp()
 	
 		class Message
 		{
@@ -60,49 +60,49 @@ namespace felidae
 
 			~Message(void){}
 
-			// Get name of measurement, if exists
-			inline std::string get_measure(void);
+			/// Get name of measurement, if exists
+			inline std::string get_measure(void) const;
 
-			// Set name of measurement or overwrite existing one
+			/// Set name of measurement or overwrite existing one
 			inline ERC set_measure(std::string measure_name);
 
-			// Get a tag value for a tag in this measurement
-			inline std::string get_tag_value(std::string tag_key);
+			/// Get a tag value for a tag in this measurement
+			inline std::string get_tag_value(std::string tag_key) const;
 
-			// Set a tag value for an existing tag in this measurment
+			/// Set a tag value for an existing tag in this measurment
 			inline ERC set_tag_value(std::string tag_key, std::string tag_value);
 
-			// Add a new tag to this measurement
+			/// Add a new tag to this measurement
 			inline ERC add_tag_set(std::string tag_key, std::string tag_value);
 
-			// Remove an existing tag from this measurement
+			/// Remove an existing tag from this measurement
 			inline ERC remove_tag_set(std::string tag_key);
 
-			// Get a field value for a field in this measurement
-			inline std::string get_field_value(std::string field_key);
+			/// Get a field value for a field in this measurement
+			inline std::string get_field_value(std::string field_key) const;
 
-			// Set a field value for an existing field in this measurment
+			/// Set a field value for an existing field in this measurment
 			inline ERC set_field_value(std::string field_key, value_t field_value);
 
-			// Add a new field to this measurement
+			/// Add a new field to this measurement
 			inline ERC add_field_set(std::string field_key, value_t field_value);
 
-			// Remove an existing field from this measurement
+			/// Remove an existing field from this measurement
 			inline ERC remove_field_set(std::string field_key);
 
-			// Get the timestamp of this measurement
-			inline std::string get_timestamp(void);
+			/// Get the timestamp of this measurement
+			inline std::string get_timestamp(void) const;
 
-			// Update the timestamp of this measurement
+			/// Update the timestamp of this measurement
 			inline ERC set_timestamp(std::string timestamp);
 
-			// Serialize this measurement
-			inline std::string dump(void);
+			/// Serialize this measurement
+			inline std::string dump(void) const;
 
-			// TODO : Docs
-			// static inline ERC parse(std::string msg);
+			// TODO : influx::Message::parse()
+			// static inline ERC parse(std::string msg) const;
 
-			// Clear all existing measurements
+			/// Clear all existing measurements
 			inline void clear(void);
 
 		private:
@@ -118,7 +118,7 @@ namespace felidae
 		// Definitions
 		// ------------------------------------------------
 
-		std::string Message::get_measure(void)
+		std::string Message::get_measure(void) const
 		{
 			return m_measure;
 		}
@@ -140,13 +140,13 @@ namespace felidae
 
 
 
-		std::string Message::get_tag_value(std::string tag_key)
+		std::string Message::get_tag_value(std::string tag_key) const
 		{
 			std::string tag_value = "";
 
 			if (m_tags.find(tag_key) != m_tags.end())
 			{
-				tag_value = m_tags[tag_key];
+				tag_value = m_tags.at(tag_key);
 			}
 
 			return tag_value;
@@ -204,7 +204,7 @@ namespace felidae
 
 
 
-		std::string Message::get_field_value(std::string field_key)
+		std::string Message::get_field_value(std::string field_key) const
 		{
 			std::string field_value = "";
 
@@ -282,7 +282,7 @@ namespace felidae
 
 
 
-		std::string Message::get_timestamp(void)
+		std::string Message::get_timestamp(void) const
 		{
 			return m_timestamp;
 		}
@@ -304,7 +304,7 @@ namespace felidae
 
 
 
-		std::string Message::dump(void)
+		std::string Message::dump(void) const
 		{
 			std::string dump;
 
