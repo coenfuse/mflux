@@ -2,7 +2,7 @@
 #pragma once
 
 // standard includes
-#include <string>
+#include <string>								// String data structure
 
 // internal includes
 // ..
@@ -22,7 +22,25 @@ namespace felidae
 {
 	namespace mqtt
 	{
-		// TODO : Docs
+		/// This data structure represents a common mqtt payload
+		/// that is sent over or received from the mqtt network
+		///
+		/// Here we have 4 parameters to consider, these are:
+		/// Topic     : The MQTT topic this message has been or going to be published to.
+		/// Payload   : The actual payload of this MQTT message.
+		/// QOS       : The QOS (Quality-of-Service) number of this message.
+		/// Retention : The retention status of this MQTT message.
+		///
+		/// * An MQTT topic doesn't have to be single topic, it
+		///   can be nested topic as well, e.g : home/room1/temp/
+		/// * The payload can be any alphanumeric string of any
+		///	  length.
+		/// * The QOS number determines the transmission quality that
+		///   must be ensured during transfer of this message. Valid
+		///   QOS values are 0, 1 and 2 only.
+		/// * The retention status is a boolean parameter that
+		///   tells whether to retain this message on MQTT
+		///   broker or not
 
 		class Message
 		{
@@ -31,35 +49,35 @@ namespace felidae
 			Message(void){}
 			~Message(void){}
 			
-			// TODO : Docs
-			inline std::string get_topic(void);
+			/// Get the publish topic for this MQTT message
+			inline std::string get_topic(void) const;
 
-			// TODO : Docs
+			/// Set the publish topic for this MQTT message
 			inline void set_topic(std::string topic);
 			
-			// TODO : Docs
-			inline std::string get_payload(void);
+			/// Get the string payload for this MQTT message
+			inline std::string get_payload(void) const;
 			
-			// TODO : Docs
+			/// Set the string payload for this MQTT message
 			inline void set_payload(std::string payload);
 
-			// TODO : Docs
-			inline uint8_t get_qos(void);
+			/// Get this MQTT message's QOS
+			inline uint8_t get_qos(void) const;
 
-			// TODO : Docs
+			/// Set this MQTT message's QOS
 			inline void set_qos(uint8_t qos);
 			
-			// TODO : Docs
-			inline bool get_to_retain(void);
+			/// Get the retention status of this MQTT message
+			inline bool get_to_retain(void) const;
 
-			// TODO : Docs
+			/// Set the retention status of this MQTT message
 			inline void set_to_retain(bool retain_status);
 
 			// TODO : mqtt::Message::dump()
-			// inline std::string dump();
+			// inline std::string dump() const;
 			
-			// TODO : Docs
-			// static inline ERC parse(std::string msg);
+			// TODO : mqtt::Message::parse()
+			// static inline ERC parse(std::string msg) const;
 
 		private:
 
@@ -100,28 +118,28 @@ namespace felidae
 			m_to_retain = retain_status;
 		}
 
-		std::string Message::get_topic(void)
+		std::string Message::get_topic(void) const
 		{
 			return m_topic;
 		}
 
-		std::string Message::get_payload(void)
+		std::string Message::get_payload(void) const
 		{
 			return m_payload;
 		}
 
-		uint8_t Message::get_qos(void)
+		uint8_t Message::get_qos(void) const
 		{
 			return m_qos;
 		}
 
-		bool Message::get_to_retain(void)
+		bool Message::get_to_retain(void) const
 		{
 			return m_to_retain;
 		}
 
 		/*
-		std::string Message::dump(void)
+		std::string Message::dump(void) const
 		{
 			auto mqtt_msg_dump = "";
 
@@ -130,7 +148,7 @@ namespace felidae
 		*/
 
 		/*
-		ERC Message::parse(std::string msg)
+		ERC Message::parse(std::string msg) const
 		{
 			auto status = ERC::SUCCESS;
 
