@@ -29,6 +29,8 @@
 
 namespace felidae
 {
+	// TODO : Docs
+
 	class Engine
 	{
 	public:
@@ -36,9 +38,13 @@ namespace felidae
 		Engine();
 		~Engine();
 
+		// TODO : Docs
 		ERC start(std::shared_ptr<Configurator> p_config);
+		
+		// TODO : Docs
 		ERC stop(void);
 
+		// TODO : Docs
 		bool is_running(void);
 
 	private:

@@ -31,6 +31,9 @@
 
 namespace felidae
 {
+
+	// TODO : Docs
+
 	class DBitem
 	{
 	public:
@@ -41,6 +44,7 @@ namespace felidae
 		~DBitem()
 		{}
 
+		// TODO : Docs
 		template <typename T>
 		inline ERC get(T& copy_into)
 		{
@@ -55,6 +59,7 @@ namespace felidae
 			return status;
 		}
 
+		// TODO : Docs
 		template <typename T>
 		inline ERC set(T value)
 		{
@@ -80,6 +85,7 @@ namespace felidae
 	};
 
 
+	// TODO : Docs
 
 	class MemDB
 	{
@@ -88,26 +94,27 @@ namespace felidae
 		MemDB(void);
 		~MemDB(void);
 
-		// Push a DB item into a DB column
+		/// Push a DB item into a DB column
 		ERC push(std::string column_name, DBitem item);
 		
-		// Pop a DB item from a DB column
+		/// Pop a DB item from a DB column
 		ERC pop(std::string column_name, DBitem& pop_into);
 
-		// Check if the database is empty
+		/// Check if the database is empty
 		bool is_empty(void);
 
-		// Check if a DB column is empty
+		/// Check if a DB column is empty
 		bool is_empty(std::string column_name);
 
-		// Purge a database column
+		/// Purge a database column
 		ERC purge(std::string column_name);
 
-		// Drop the database
+		/// Drop the database
 		ERC drop(void);
 
 	private:
 
+		/// Checks whether a data colum already exists in the DB or not
 		bool column_exists(std::string column_name);
 
 	private:

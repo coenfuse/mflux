@@ -3,6 +3,7 @@
 
 // internal includes
 #include "mqtt/client.h"
+#include "mqtt/message.h"
 
 // module includes
 // ..

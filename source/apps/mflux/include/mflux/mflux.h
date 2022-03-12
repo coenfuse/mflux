@@ -23,18 +23,27 @@
 
 namespace felidae
 {
+    // TODO : Docs
+
     class Mflux
     {
     public:
 
         Mflux(void);
         ~Mflux(void);
+        
+        // TODO : Docs
         ERC start(int argc, char* argv[]);
+        
+        // TODO : Docs
         void stop(void);
         
     private:
 
+        // TODO : Docs
         ERC process_command_line(int argc, char* argv[]);
+    
+        // TODO : Docs
         ERC init_logging(void);
 
     private:

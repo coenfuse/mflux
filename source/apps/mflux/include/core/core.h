@@ -29,6 +29,8 @@
 
 namespace felidae
 {
+	// TODO : Docs
+
 	class Core
 	{
 	public:
@@ -36,14 +38,21 @@ namespace felidae
 		Core();
 		~Core();
 
+		// TODO : Docs
 		ERC start(std::shared_ptr<MemDB> p_buffer);
+		
+		// TODO : Docs
 		ERC stop(void);
 
+		// TODO : Docs
 		bool is_running(void);
 
 	private:
 
+		// TODO : Docs
 		static void s_job_wrapper(void* instance);
+		
+		// TODO : Docs
 		void m_actual_job(void);
 
 	private:
