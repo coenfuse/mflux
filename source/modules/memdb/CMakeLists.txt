@@ -5,7 +5,7 @@ set(PROJECT_HDRS "include/memdb/memdb.h")
 set(PROJECT_SRCS "src/memdb.cpp")
 
 # Setting up target
-project("memdb" VERSION 0.1.0)
+project("memdb" VERSION 1.0.0)
 
 # Setting up target specific options
 # option(MEMDB_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)
