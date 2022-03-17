@@ -73,7 +73,7 @@ namespace felidae
     {
         auto log_lvl = m_config_json["log_level"];
         
-        if ((log_lvl >= 0) && (log_lvl < 6))
+        if ((log_lvl >= 0) && (log_lvl < 5))
             return log_lvl;
         else
             return 1;   // Default level is 1 (DEBUG)
