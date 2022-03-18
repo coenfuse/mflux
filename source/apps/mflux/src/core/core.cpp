@@ -14,7 +14,7 @@
 
 
 // third party includes
-// ..
+#include "spdlog/spdlog.h"
 
 
 
@@ -33,6 +33,8 @@ namespace felidae
 		
 		if (!this->is_running())
 		{
+			spdlog::debug("{} starting", SELF_NAME);
+
 			m_pBuffer = p_buffer;
 
 			if (m_pBuffer == nullptr)
@@ -42,7 +44,9 @@ namespace felidae
 				m_worker = std::thread(s_job_wrapper, this);
 
 			if (this->is_running())
-				status = ERC::SUCCESS;
+				spdlog::info("{} running", SELF_NAME);
+			else
+				spdlog::error("{} failed to start with code {}", SELF_NAME, status);
 		}
 
 		return status;
@@ -55,8 +59,12 @@ namespace felidae
 		
 		if (this->is_running())
 		{
+			spdlog::debug("{} stopping", SELF_NAME);
+
 			m_signalled_stop.exchange(true);
 			m_worker.join();
+
+			spdlog::info("{} stopped", SELF_NAME);
 		}
 
 		return status;

@@ -57,6 +57,8 @@ namespace felidae
 
 	private:
 
+		static constexpr const char* SELF_NAME = "CORE";
+		
 		std::shared_ptr<felidae::MemDB> m_pBuffer = nullptr;
 		
 		std::atomic_bool m_signalled_stop = true;

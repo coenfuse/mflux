@@ -49,6 +49,8 @@ namespace felidae
 
 	private:
 
+		static constexpr const char* SELF_NAME = "ENGINE";
+
 		// The following object pointers will not be updated and shared further
 		std::unique_ptr<Core> m_pCore = nullptr;
 		std::unique_ptr<mqtt::Client> m_pMqtt_sc = nullptr;

@@ -48,6 +48,8 @@ namespace felidae
 
     private:
 
+		static constexpr const char* SELF_NAME = "MFLUX";
+
         bool m_is_logging_to_std = false;
         bool m_is_verbose = false;
 

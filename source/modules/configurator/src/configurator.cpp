@@ -34,8 +34,6 @@ namespace felidae
 {
     Configurator::Configurator(std::string file_path)
     {
-        // TODO : Improve this, add logging.
-
         std::string json_raw;
         std::ifstream ifs(file_path);
 
@@ -56,7 +54,7 @@ namespace felidae
         }
         catch (std::exception& e)
         {
-            spdlog::error("Exception {}", e.what());
+            spdlog::error("{} parsing exception occurred {}", SELF_NAME, e.what());
         }
     }
 

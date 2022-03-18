@@ -39,7 +39,7 @@ namespace felidae
             status = init_logging();
 
         if (status == ERC::SUCCESS)
-            spdlog::info("{} starting", m_name);
+            spdlog::debug("{} starting", SELF_NAME);
 
         if (status == ERC::SUCCESS)
             m_engine = std::make_unique<felidae::Engine>();
@@ -52,19 +52,19 @@ namespace felidae
 
         if (status == ERC::SUCCESS)
         {
-            spdlog::info("{} running", m_name);
+            spdlog::info("{} running", SELF_NAME);
             
             while (m_engine->is_running() && !m_signalled_stop)
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-            spdlog::info("{} stopping", m_name);
+            
+            spdlog::debug("{} stopping", SELF_NAME);
         }
-
-        if (status == ERC::SUCCESS)
+        
+        if (m_engine->is_running())
             status = m_engine->stop();
 
         if (status == ERC::SUCCESS)
-            spdlog::info("{} stopped", m_name);
+            spdlog::info("{} stopped", SELF_NAME);
 
         return status;
     }
@@ -120,7 +120,7 @@ namespace felidae
         {
             if (!std::filesystem::create_directories(logdir))
             {
-                std::cerr << fmt::format("ERROR : Unable to create log dir '{}'", logdir);
+                spdlog::error("{} unable to create log dir {}", SELF_NAME, logdir);
                 status = ERC::FAILURE;
             }
         }
@@ -157,6 +157,7 @@ namespace felidae
             // Set pattern and flushing
             spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e UTC] [%L] %v", spdlog::pattern_time_type::utc);
             spdlog::flush_on((spdlog::level::level_enum)m_config->get_log_level());                     // Typecasting uint16_t to spdlog level_enum
+            spdlog::flush_every(std::chrono::seconds(1));
         }
 
         return status;

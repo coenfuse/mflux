@@ -37,7 +37,7 @@ void setupSignalHandlers()
 	// Interrupt
 	signal(SIGINT, [](int signal)
 		{
-			spdlog::info("SIGINT received");
+			spdlog::debug("SIGINT received");
 			p_mflux->stop();
 		}
 	);
@@ -60,6 +60,12 @@ void setupSignalHandlers()
 }
 
 
+// TODO : Command line arguments class
+// TODO : Command line arguments parser
+// TODO : Logging setup
+
+
+// TODO : Docs
 
 int main(int argc, char* argv[])
 {
@@ -79,7 +85,7 @@ int main(int argc, char* argv[])
 		}
 		catch (std::exception &e)
 		{
-			std::cerr << fmt::format("Exception {}", e.what());
+			spdlog::error("Exception {}", e.what());
 			status = felidae::ERC::EXCEPTION;
 		}
 	}

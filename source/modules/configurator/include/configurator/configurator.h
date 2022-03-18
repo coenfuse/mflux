@@ -130,6 +130,8 @@ namespace felidae
 
     private:
 
+		static constexpr const char* SELF_NAME = "CONFIG";
+
         nlohmann::json m_config_json;
     };
 }
