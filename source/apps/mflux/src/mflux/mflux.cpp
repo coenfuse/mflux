@@ -13,8 +13,8 @@
 #include "CLI/CLI.hpp"
 #include "fmt/format.h"
 #include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/sinks/rotating_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 
 
@@ -129,35 +129,44 @@ namespace felidae
         {
             std::vector<spdlog::sink_ptr> sinks;
 
-            // Add rotating file logging sink - Max file size of 10MB and max of 10 log files
-            auto log_file = fmt::format("{}/{}.log", logdir, m_name);
-            auto pFileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_file, 1048576 * 10, 10);
-            sinks.push_back(pFileSink);
-
-            // Add stdout sink if enabled
+            // Setting console sink if enabled
             if (m_is_logging_to_std)
             {
-                auto pStdoutSink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
-                sinks.push_back(pStdoutSink);
+                auto p_console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+                
+                // Setting console log level
+                if (m_is_verbose) p_console_sink->set_level(spdlog::level::debug);
+                else p_console_sink->set_level(spdlog::level::info);
+
+                // Adding console sink to sinks list
+                sinks.push_back(p_console_sink);
             }
 
-            // Create a logger with the sinks
-            auto pLogger = std::make_shared<spdlog::logger>("mflux", sinks.begin(), sinks.end());
+            // Setting file logger
+            {
+                auto log_file = fmt::format("{}/{}.log", logdir, m_name);
 
-            // Register and set as default
-            spdlog::register_logger(pLogger);
-            spdlog::set_default_logger(pLogger);
+                // Add rotating file logging sink - Max file size of 10MB and max of 10 log files
+                auto p_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_file, 1048576 * 10, 10);
 
-            // Set the default log level to info
-            if (m_is_logging_to_std && m_is_verbose)
-                spdlog::set_level(spdlog::level::debug);
-            else
-                spdlog::set_level(spdlog::level::info);
+                // Setting file log level, typecasting uint16_t to spdlog_level_enum
+                p_file_sink->set_level((spdlog::level::level_enum)m_config->get_log_level());
+                
+                // Adding file sink to sinks list
+                sinks.push_back(p_file_sink);
+            }
 
-            // Set pattern and flushing
-            spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e UTC] [%L] %v", spdlog::pattern_time_type::utc);
-            spdlog::flush_on((spdlog::level::level_enum)m_config->get_log_level());                     // Typecasting uint16_t to spdlog level_enum
+            // Creating a logger with the sinks
+            auto p_logger = std::make_shared<spdlog::logger>("mflux_logger", sinks.begin(), sinks.end());
+
+            spdlog::register_logger(p_logger);
+            spdlog::set_default_logger(p_logger);
+
+            spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e UTC] %^[%L]%$ %v", spdlog::pattern_time_type::utc);
             spdlog::flush_every(std::chrono::seconds(1));
+            
+            // Global log level, ceiling for all sinks
+            spdlog::set_level(spdlog::level::trace);
         }
 
         return status;
