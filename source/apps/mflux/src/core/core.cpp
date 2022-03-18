@@ -44,7 +44,7 @@ namespace felidae
 				m_worker = std::thread(s_job_wrapper, this);
 
 			if (this->is_running())
-				spdlog::info("{} running", SELF_NAME);
+				spdlog::info("{} started", SELF_NAME);
 			else
 				spdlog::error("{} failed to start with code {}", SELF_NAME, status);
 		}
@@ -62,6 +62,9 @@ namespace felidae
 			spdlog::debug("{} stopping", SELF_NAME);
 
 			m_signalled_stop.exchange(true);
+
+			spdlog::trace("{} signalled to stop", SELF_NAME);
+
 			m_worker.join();
 
 			spdlog::info("{} stopped", SELF_NAME);

@@ -65,7 +65,7 @@ void setupSignalHandlers()
 // TODO : Logging setup
 
 
-// TODO : Docs
+// The entry point of the program
 
 int main(int argc, char* argv[])
 {

@@ -52,7 +52,7 @@ namespace felidae
 				status = m_pInflux_sc->start_service(p_config, m_pBuffer);
 
 			if (status == ERC::SUCCESS)
-				spdlog::info("{} running", SELF_NAME);
+				spdlog::info("{} started", SELF_NAME);
 			else
 				spdlog::error("{} failed to start with code {}", SELF_NAME, status);
 		}
