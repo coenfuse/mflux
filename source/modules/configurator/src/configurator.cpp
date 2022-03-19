@@ -1,14 +1,16 @@
 // standard includes
 #include <chrono>
 #include <fstream>
-#include <thread>
 #include <vector>
+
 
 // internal includes
 #include "configurator/configurator.h"
 
+
 // module includes
 #include "errorcodes/errorcodes.h"
+
 
 // third party includes
 #include "spdlog/spdlog.h"
@@ -62,12 +64,12 @@ namespace felidae
     {}
 
     // General global level configurations
-    std::string Configurator::get_logdir(void)
+    std::string Configurator::get_logdir(void) const
     {
         return m_config_json["log_dir"];
     }
 
-    uint16_t Configurator::get_log_level(void)
+    uint16_t Configurator::get_log_level(void) const
     {
         auto log_lvl = m_config_json["log_level"];
         
@@ -78,74 +80,74 @@ namespace felidae
     }
         
     // Watchdog configurations
-    bool Configurator::is_watchdog_on(void)
+    bool Configurator::is_watchdog_on(void) const
     {
         return m_config_json["watchdog_on"];
     }
 
-    uint16_t Configurator::get_watchdog_log_level(void)
+    uint16_t Configurator::get_watchdog_log_level(void) const
     {
         return m_config_json["watchdog_log_level"];
     }
     
-    uint16_t Configurator::get_watchdog_timeout_s(void)
+    uint16_t Configurator::get_watchdog_timeout_s(void) const
     {
         return m_config_json["watchdog_timeout_s"];
     }
     
-    std::string Configurator::get_watchdog_command(void)
+    std::string Configurator::get_watchdog_command(void) const
     {
         return m_config_json["watchdog_command"];
     }
     
 
     // MQTT configurations
-    bool Configurator::is_mqtt_on(void)
+    bool Configurator::is_mqtt_on(void) const
     {
         return m_config_json["mqtt_on"];
     }
     
-    uint16_t Configurator::get_mqtt_log_level(void)
+    uint16_t Configurator::get_mqtt_log_level(void) const
     {
         return m_config_json["mqtt_log_level"];
     }
     
-    std::string Configurator::get_mqtt_client_name(void)
+    std::string Configurator::get_mqtt_client_name(void) const
     {
         return m_config_json["mqtt_client_name"];
     }
     
-    bool Configurator::is_mqtt_clean(void)
+    bool Configurator::is_mqtt_clean(void) const
     {
         return m_config_json["mqtt_is_clean"];
     }
     
-    std::string Configurator::get_mqtt_host(void)
+    std::string Configurator::get_mqtt_host(void) const
     {
         return m_config_json["mqtt_host"];
     }
     
-    uint16_t Configurator::get_mqtt_port(void)
+    uint16_t Configurator::get_mqtt_port(void) const
     {
         return m_config_json["mqtt_port"];
     }
     
-    uint16_t Configurator::get_mqtt_timeout_s(void)
+    uint16_t Configurator::get_mqtt_timeout_s(void) const
     {
         return m_config_json["mqtt_timeout_s"];
     }
     
-    std::string Configurator::get_mqtt_username(void)
+    std::string Configurator::get_mqtt_username(void) const
     {
         return m_config_json["mqtt_username"];
     }
     
-    std::string Configurator::get_mqtt_password(void)
+    std::string Configurator::get_mqtt_password(void) const
     {
         return m_config_json["mqtt_password"];
     }
     
-    std::vector<mqtt::Subscription> Configurator::get_mqtt_sub_list(void)
+    std::vector<mqtt::Subscription> Configurator::get_mqtt_sub_list(void) const
     {
         std::vector<mqtt::Subscription> sub_list;
 
@@ -165,57 +167,57 @@ namespace felidae
     
 
     // Influx configurations
-    bool Configurator::is_influx_on(void)
+    bool Configurator::is_influx_on(void) const
     {
         return m_config_json["influx_on"];
     }
     
-    uint16_t Configurator::get_influx_log_level(void)
+    uint16_t Configurator::get_influx_log_level(void) const
     {
         return m_config_json["influx_log_level"];
     }
     
-    std::string Configurator::get_influx_client_name(void)
+    std::string Configurator::get_influx_client_name(void) const
     {
         return m_config_json["influx_client_name"];
     }
     
-    std::string Configurator::get_influx_host(void)
+    std::string Configurator::get_influx_host(void) const
     {
         return m_config_json["influx_host"];
     }
     
-    uint16_t Configurator::get_influx_port(void)
+    uint16_t Configurator::get_influx_port(void) const
     {
         return m_config_json["influx_port"];
     }
     
-    uint16_t Configurator::get_influx_timeout_s(void)
+    uint16_t Configurator::get_influx_timeout_s(void) const
     {
         return m_config_json["influx_timeout_s"];
     }
     
-    std::string Configurator::get_influx_org_name(void)
+    std::string Configurator::get_influx_org_name(void) const
     {
         return m_config_json["influx_org_name"];
     }
     
-    std::string Configurator::get_influx_db_name(void)
+    std::string Configurator::get_influx_db_name(void) const
     {
         return m_config_json["influx_db_name"];
     }
     
-    std::string Configurator::get_influx_db_username(void)
+    std::string Configurator::get_influx_db_username(void) const
     {
         return m_config_json["influx_db_username"];
     }
     
-    std::string Configurator::get_influx_db_password(void)
+    std::string Configurator::get_influx_db_password(void) const
     {
         return m_config_json["influx_db_password"];
     }
     
-    std::string Configurator::get_influx_db_auth_key(void)
+    std::string Configurator::get_influx_db_auth_key(void) const
     {
         return m_config_json["influx_db_auth_key"];
     }
