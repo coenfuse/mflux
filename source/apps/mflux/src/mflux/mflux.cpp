@@ -139,7 +139,7 @@ namespace felidae
                 
                 // Setting console log level
                 if (m_is_verbose) 
-                    p_console_sink->set_level(spdlog::level::trace);
+                    p_console_sink->set_level(spdlog::level::debug);
                 else 
                     p_console_sink->set_level(spdlog::level::info);
 
