@@ -5,7 +5,7 @@ set(PROJECT_HDRS "include/mqtt/client.h" "include/mqtt/message.h" "include/mqtt/
 set(PROJECT_SRCS "src/client.cpp")
 
 # Setting up target
-project("mqtt" VERSION 0.2.0)
+project("mqtt" VERSION 0.3.0)
 
 # Setting up target specific options
 # option(MQTT_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)

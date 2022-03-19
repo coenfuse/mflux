@@ -9,8 +9,7 @@
     // DEBUG    : 1
     // INFO     : 2
     // WARNING  : 3
-    // CRITICAL : 4
-    // ERROR    : 5   Most concise
+    // ERROR    : 4   Most concise
 
     // Config Name
     // -----------------------------------

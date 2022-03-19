@@ -1,6 +1,7 @@
 // preprocessor flags
 #pragma once
 
+
 // standard includes
 #include <chrono>								// Library to deal with data time
 #include <cstdint>								// Gives uint64_t and other data int types
@@ -8,14 +9,18 @@
 #include <string>								// String data structure
 #include <variant>								// Type-safe union data structure
 
+
 // internal includes
 // ..
+
 
 // module includes
 #include "errorcodes/errorcodes.h"
 
+
 // thirdparty includes
 #include "spdlog/fmt/fmt.h"
+
 
 // forward references
 // ..

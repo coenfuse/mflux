@@ -1,16 +1,19 @@
 // standard includes
 #include <iostream>
 
+
 // internal includes
 #include "influx/client.h"
 #include "influx/message.h"
 
+
 // module includes
 // ..
 
+
 // thirdparty includes
 // cinflux
-
+#include "spdlog/spdlog.h"
 
 
 namespace felidae
@@ -96,6 +99,8 @@ namespace felidae
 
 			if (!this->is_running())
 			{
+				spdlog::debug("{} service starting", SELF_NAME);
+
 				m_pConfig = p_config;
 				m_pBuffer = p_buffer;
 
@@ -107,6 +112,11 @@ namespace felidae
 
 				if (this->is_running())
 					status = ERC::SUCCESS;
+
+				if (status == ERC::SUCCESS)
+					spdlog::info("{} service started", SELF_NAME);
+				else
+					spdlog::error("{} service failed to start with code {}", SELF_NAME, status);
 			}
 
 			return status;
@@ -118,8 +128,12 @@ namespace felidae
 
 			if (this->is_running())
 			{
+				spdlog::debug("{} service stopping", SELF_NAME);
+
 				m_signalled_stop.exchange(true);
 				m_worker.join();
+
+				spdlog::info("{} service stopped", SELF_NAME);
 			}
 
 			return status;
@@ -156,7 +170,7 @@ namespace felidae
 					if (status == ERC::SUCCESS)
 						status = dbitem.get<influx::Message>(influx_msg);
 
-					std::cout << "Received " << influx_msg.dump() << std::endl;
+					spdlog::trace("Received {}", influx_msg.dump());
 
 					// Send it to Influx DB
 					// if (status == ERC::SUCCESS)
@@ -164,7 +178,7 @@ namespace felidae
 				}
 
 				// Take a breath for while
-				std::this_thread::sleep_for(std::chrono::milliseconds(5));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			}
 		}
 
