@@ -2,11 +2,14 @@
 #include <csignal>
 #include <iostream>
 
+
 // internal includes
 #include "mflux/mflux.h"
 
+
 // module includes
 #include "errorcodes/errorcodes.h"
+
 
 // third party includes
 #include "fmt/format.h"
@@ -27,7 +30,12 @@ static std::unique_ptr<felidae::Mflux> p_mflux;
 void setupSignalHandlers()
 {
 	// Abort termination triggered by abort call
-	signal(SIGABRT, [](int signal) {});
+	signal(SIGABRT, [](int signal)
+		{
+			spdlog::debug("SIGABRT received");
+			p_mflux->stop();
+		}
+	);
 
 
 	// Floating point exception
@@ -37,7 +45,7 @@ void setupSignalHandlers()
 	// Interrupt
 	signal(SIGINT, [](int signal)
 		{
-			spdlog::info("SIGINT received");
+			spdlog::debug("SIGINT received");
 			p_mflux->stop();
 		}
 	);
@@ -52,7 +60,12 @@ void setupSignalHandlers()
 
 
 	// Software termination signal from kill
-	signal(SIGTERM, [](int signal) {});
+	signal(SIGTERM, [](int signal) 
+		{
+			spdlog::debug("SIGTERM received");
+			p_mflux->stop();
+		}
+	);
 
 
 	// Ctrl-Break sequence
@@ -60,6 +73,11 @@ void setupSignalHandlers()
 }
 
 
+// TODO : Args class and parser
+// TODO : Logging setup
+
+
+// The entry point of the program
 
 int main(int argc, char* argv[])
 {
@@ -79,7 +97,7 @@ int main(int argc, char* argv[])
 		}
 		catch (std::exception &e)
 		{
-			std::cerr << fmt::format("Exception {}", e.what());
+			spdlog::error("Exception {}", e.what());
 			status = felidae::ERC::EXCEPTION;
 		}
 	}

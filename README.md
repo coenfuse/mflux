@@ -2,7 +2,7 @@
 
 ### What is this repository for? ###
 
-* Mflux v0.2.0 is a gateway application that performs bi-directional transfer of data between MQTT network and InfluxDB.
+* Mflux v0.3.0 is a gateway application that performs bi-directional transfer of data between MQTT network and InfluxDB.
 
 ### How do I get set up? ###
 

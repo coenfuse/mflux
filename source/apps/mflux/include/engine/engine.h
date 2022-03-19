@@ -29,7 +29,10 @@
 
 namespace felidae
 {
-	// TODO : Docs
+	/// The Engine class is responsible for managing all the
+	/// concurrent operating modules that are required to
+	/// make Mflux work. The runtime of Engine decides the
+	/// life-cycle of the Mflux application.
 
 	class Engine
 	{
@@ -38,16 +41,18 @@ namespace felidae
 		Engine();
 		~Engine();
 
-		// TODO : Docs
+		/// Start the engine with specified configuration
 		ERC start(std::shared_ptr<Configurator> p_config);
-		
-		// TODO : Docs
+
+		/// Stop the engine if running
 		ERC stop(void);
 
-		// TODO : Docs
+		/// Get runtime status of engine
 		bool is_running(void);
 
 	private:
+
+		static constexpr const char* SELF_NAME = "ENGINE";
 
 		// The following object pointers will not be updated and shared further
 		std::unique_ptr<Core> m_pCore = nullptr;

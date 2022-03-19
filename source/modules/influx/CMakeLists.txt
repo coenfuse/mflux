@@ -5,7 +5,7 @@ set(PROJECT_HDRS "include/influx/client.h" "include/influx/message.h")
 set(PROJECT_SRCS "src/client.cpp")
 
 # Setting up target
-project("influx" VERSION 0.2.0)
+project("influx" VERSION 0.3.0)
 
 # Setting up target specific options
 # option(INFLUX_BUILD_TESTS "Generate unit tests for ${PROJECT_NAME}" OFF)

@@ -1,16 +1,19 @@
 // standard includes
 #include <memory>
 
+
 // internal includes
 #include "engine/engine.h"
+
 
 // module includes
 #include "influx/client.h"
 #include "memdb/memdb.h"
 #include "mqtt/client.h"
 
+
 // third party includes
-// ..
+#include "spdlog/spdlog.h"
 
 
 namespace felidae
@@ -34,8 +37,16 @@ namespace felidae
 
 		if (!this->is_running())
 		{
+			spdlog::debug("{} starting", SELF_NAME);
+
 			if ((p_config == nullptr) || (m_pCore == nullptr) || (m_pBuffer == nullptr) || (m_pInflux_sc == nullptr) || (m_pMqtt_sc == nullptr))
+			{
+				spdlog::error("{} failed to initialize", SELF_NAME);
 				status = ERC::MEMORY_ALLOCATION_FAILED;
+			}
+
+			if (status == ERC::SUCCESS)
+				status = m_pCore->start(m_pBuffer);
 
 			if (status == ERC::SUCCESS)
 				status = m_pMqtt_sc->start_service(p_config, m_pBuffer);
@@ -44,7 +55,9 @@ namespace felidae
 				status = m_pInflux_sc->start_service(p_config, m_pBuffer);
 
 			if (status == ERC::SUCCESS)
-				status = m_pCore->start(m_pBuffer);
+				spdlog::info("{} started", SELF_NAME);
+			else
+				spdlog::error("{} failed to start with code {}", SELF_NAME, status);
 		}
 
 		return status;
@@ -56,6 +69,8 @@ namespace felidae
 		
 		if (this->is_running())
 		{
+			spdlog::debug("{} stopping", SELF_NAME);
+
 			status = m_pCore->stop();
 
 			if (status == ERC::SUCCESS)
@@ -63,6 +78,11 @@ namespace felidae
 
 			if (status == ERC::SUCCESS)
 				status = m_pMqtt_sc->stop_service();
+
+			if (status == ERC::SUCCESS)
+				spdlog::info("{} stopped", SELF_NAME);
+			else
+				spdlog::error("{} failed to stop with code {}", SELF_NAME, status);
 		}
 
 		return status;

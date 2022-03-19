@@ -1,15 +1,19 @@
 // standard includes
 // ..
 
+
 // internal includes
 #include "mqtt/client.h"
 #include "mqtt/message.h"
 
+
 // module includes
 // ..
 
+
 // thirdparty includes
 // mosquitto
+#include "spdlog/spdlog.h"
 
 
 
@@ -87,6 +91,8 @@ namespace felidae
 
 			if (!this->is_running())
 			{
+				spdlog::debug("{} service starting", SELF_NAME);
+
 				m_pConfig = p_config;
 				m_pBuffer = p_buffer;
 
@@ -98,6 +104,11 @@ namespace felidae
 
 				if (this->is_running())
 					status = ERC::SUCCESS;
+
+				if (status == ERC::SUCCESS)
+					spdlog::info("{} service started", SELF_NAME);
+				else
+					spdlog::error("{} service failed to start with code {}", SELF_NAME, status);
 			}
 
 			return status;
@@ -109,8 +120,12 @@ namespace felidae
 
 			if (this->is_running())
 			{
+				spdlog::debug("{} service stopping", SELF_NAME);
+
 				m_signalled_stop.exchange(true);
 				m_worker.join();
+
+				spdlog::info("{} service stopped", SELF_NAME);
 			}
 
 			return status;
@@ -149,7 +164,7 @@ namespace felidae
 
 				m_pBuffer->push(buffer_name, dbitem);
 				
-				fmt::print("\nSent     {} payload: {} qos: {} retention: {}\n", mqtt_msg.get_topic(), mqtt_msg.get_payload(), mqtt_msg.get_qos(), mqtt_msg.get_to_retain());
+				spdlog::trace("Sent     {} payload: {} qos: {} retention: {}", mqtt_msg.get_topic(), mqtt_msg.get_payload(), mqtt_msg.get_qos(), mqtt_msg.get_to_retain());
 
 				// Take a break for a while
 				std::this_thread::sleep_for(std::chrono::seconds(3));

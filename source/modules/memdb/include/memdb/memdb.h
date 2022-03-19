@@ -32,7 +32,17 @@
 namespace felidae
 {
 
-	// TODO : Docs
+	/// DBitem is the class that will be stored inside the
+	/// MemDB class object. It is a wrapper around templated
+	/// datatypes that a user would like to store in MemDB.
+	/// Currently, a DBitem could store either an influx::Message
+	/// object or mqtt::Message object.
+	/// This coupling with mqtt and influx module isn't
+	/// desirable and thus will be removed in the future. Then
+	/// DBitem will store an array of fundamental data types
+	/// like strings, bool, int, float, etc. Which in turn
+	/// would enable MemDB to be used in any scenario and
+	/// not only Mflux's specific use case.
 
 	class DBitem
 	{
@@ -44,7 +54,8 @@ namespace felidae
 		~DBitem()
 		{}
 
-		// TODO : Docs
+		/// Copies the data from the DBitem for the specified
+		/// datatype if exists. Otherwise returns ERC::FAILURE
 		template <typename T>
 		inline ERC get(T& copy_into)
 		{
@@ -59,7 +70,9 @@ namespace felidae
 			return status;
 		}
 
-		// TODO : Docs
+		/// Sets the DBitem value with the specified data type.
+		/// Currently allowed datatypes are influx::Message and
+		/// mqtt::Message
 		template <typename T>
 		inline ERC set(T value)
 		{
@@ -85,7 +98,9 @@ namespace felidae
 	};
 
 
-	// TODO : Docs
+	/// In memory key value database featuring basic push-pop
+	/// operations. It is used as a buffer for load balancing
+	/// asynchronous operations of mqttclient and influxclient
 
 	class MemDB
 	{
