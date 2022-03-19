@@ -1,19 +1,24 @@
 // preprocessor flags
 #pragma once
 
+
 // standard includes
 #include <memory>
 
+
 // internal includes
 // ..
+
 
 // module includes
 #include "configurator/configurator.h"
 #include "errorcodes/errorcodes.h"
 #include "memdb/memdb.h"
 
+
 // thirdparty includes
 // ..
+
 
 // forward references
 // ..
@@ -24,7 +29,15 @@ namespace felidae
 {
 	namespace mqtt
 	{
-		// TODO : Docs
+		/// Provides a consistent interface for operations 
+		/// such as connect(), publish(), on_message() etc
+		/// using the mosquitto library that communicates 
+		/// with an MQTT based broker. It also provides an 
+		/// additional functionality of start_service() &
+		/// stop_service() function that are tailor made 
+		/// for mflux that handles the pushing and publishing
+		/// of incoming and outgoing mqtt messages into and 
+		/// from mqtt buffer.
 
 		class Client
 		{
@@ -71,6 +84,8 @@ namespace felidae
 			void i_actual_job(void);
 
 		private:
+
+			static constexpr const char* SELF_NAME = "MQTT  ";
 
 			std::atomic_bool m_signalled_stop = true;
 			std::thread m_worker;
