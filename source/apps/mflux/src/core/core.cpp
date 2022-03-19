@@ -62,9 +62,6 @@ namespace felidae
 			spdlog::debug("{} stopping", SELF_NAME);
 
 			m_signalled_stop.exchange(true);
-
-			spdlog::trace("{} signalled to stop", SELF_NAME);
-
 			m_worker.join();
 
 			spdlog::info("{} stopped", SELF_NAME);
