@@ -1,21 +1,26 @@
 // preprocessor flags
 #pragma once
 
+
 // standard includes
 #include <atomic>
 #include <memory>
 #include <thread>
 
+
 // internal includes
 // ..
+
 
 // module includes
 #include "configurator/configurator.h"
 #include "errorcodes/errorcodes.h"
 #include "memdb/memdb.h"
 
+
 // thirdparty includes
 // ..
+
 
 // forward references
 // ..
@@ -26,7 +31,15 @@ namespace felidae
 {
 	namespace influx
 	{
-		// TODO : Docs
+		/// Provides a consistent interface for operations such 
+		/// as connect(), publish(), get() etc using the influxdb-cxx
+		/// library that communicates with InfluxDB (this will be
+		/// later replaced with cinflux library). This client 
+		/// also provides an additional functionality of 
+		/// start_service() and stop_service() functions that are
+		/// tailor made for mflux handling the pushing and 
+		/// publishing of incoming and outgoing influx messages 
+		/// into and from mflux buffer.
 
 		class Client
 		{
@@ -76,6 +89,8 @@ namespace felidae
 			void m_actual_job(void);
 
 		private:
+			
+			static constexpr const char* SELF_NAME = "INFLUX";
 
 			std::atomic_bool m_signalled_stop = true;
 			std::thread m_worker;
