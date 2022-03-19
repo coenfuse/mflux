@@ -63,7 +63,7 @@ namespace felidae
             spdlog::debug("{} stopping", SELF_NAME);
         }
         
-        if (m_engine->is_running())
+        if (m_engine != nullptr)
             status = m_engine->stop();
 
         if (status == ERC::SUCCESS)
