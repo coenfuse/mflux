@@ -2,11 +2,14 @@
 #include <csignal>
 #include <iostream>
 
+
 // internal includes
 #include "mflux/mflux.h"
 
+
 // module includes
 #include "errorcodes/errorcodes.h"
+
 
 // third party includes
 #include "fmt/format.h"
@@ -27,7 +30,12 @@ static std::unique_ptr<felidae::Mflux> p_mflux;
 void setupSignalHandlers()
 {
 	// Abort termination triggered by abort call
-	signal(SIGABRT, [](int signal) {});
+	signal(SIGABRT, [](int signal)
+		{
+			spdlog::debug("SIGABRT received");
+			p_mflux->stop();
+		}
+	);
 
 
 	// Floating point exception
@@ -52,7 +60,12 @@ void setupSignalHandlers()
 
 
 	// Software termination signal from kill
-	signal(SIGTERM, [](int signal) {});
+	signal(SIGTERM, [](int signal) 
+		{
+			spdlog::debug("SIGTERM received");
+			p_mflux->stop();
+		}
+	);
 
 
 	// Ctrl-Break sequence
@@ -60,8 +73,7 @@ void setupSignalHandlers()
 }
 
 
-// TODO : Command line arguments class
-// TODO : Command line arguments parser
+// TODO : Args class and parser
 // TODO : Logging setup
 
 

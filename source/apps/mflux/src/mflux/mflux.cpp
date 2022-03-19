@@ -3,11 +3,14 @@
 #include <thread>
 #include <vector>
 
+
 // internal includes
 #include "mflux/mflux.h"
 
+
 // module includes
 #include "configurator/configurator.h"
+
 
 // third party includes
 #include "CLI/CLI.hpp"
@@ -56,7 +59,7 @@ namespace felidae
             
             while (m_engine->is_running() && !m_signalled_stop)
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            
+
             spdlog::debug("{} stopping", SELF_NAME);
         }
         
@@ -135,8 +138,10 @@ namespace felidae
                 auto p_console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
                 
                 // Setting console log level
-                if (m_is_verbose) p_console_sink->set_level(spdlog::level::debug);
-                else p_console_sink->set_level(spdlog::level::info);
+                if (m_is_verbose) 
+                    p_console_sink->set_level(spdlog::level::trace);
+                else 
+                    p_console_sink->set_level(spdlog::level::info);
 
                 // Adding console sink to sinks list
                 sinks.push_back(p_console_sink);
@@ -165,7 +170,7 @@ namespace felidae
             spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e UTC] %^[%L]%$ %v", spdlog::pattern_time_type::utc);
             spdlog::flush_every(std::chrono::seconds(1));
             
-            // Global log level, ceiling for all sinks
+            // Global log level ceiling for all sinks
             spdlog::set_level(spdlog::level::trace);
         }
 

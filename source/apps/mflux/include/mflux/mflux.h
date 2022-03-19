@@ -1,20 +1,25 @@
 // preprocessor flags
 #pragma once
 
+
 // standard includes
 #include <string>
 #include <memory>
+
 
 // internal includes
 #include "app-config.h"
 #include "engine/engine.h"
 
+
 // module includes
 #include "configurator/configurator.h"
 #include "errorcodes/errorcodes.h"
 
+
 // thirdparty includes
 // ..
+
 
 // forward references
 // ..
@@ -23,7 +28,14 @@
 
 namespace felidae
 {
-    // TODO : Docs
+    /// The main Mflux application class. Internally, it
+    /// doesn't do much itself. It uses Engine and Core
+    /// classes to do the actual operation by defined usage
+    /// of modules and other units. Logically, Mflux class
+    /// serves as a shell for its internal components. This
+    /// shell exposes minimal interface to its users through
+    /// which they can edit or configure its operations as
+    /// required.
 
     class Mflux
     {
@@ -31,31 +43,32 @@ namespace felidae
 
         Mflux(void);
         ~Mflux(void);
-        
-        // TODO : Docs
+
+        /// Starts the Mflux application with incoming command
+        /// line arguments
         ERC start(int argc, char* argv[]);
-        
-        // TODO : Docs
+
+        /// Stop the Mflux application if running
         void stop(void);
-        
+
     private:
 
-        // TODO : Docs
+        /// Process the cmd args and set the basic configuration
         ERC process_command_line(int argc, char* argv[]);
-    
-        // TODO : Docs
+
+        /// Define logging parameters for Mflux that are then followed
+        /// throughout the application
         ERC init_logging(void);
 
     private:
 
-		static constexpr const char* SELF_NAME = "MFLUX";
+        static constexpr const char* SELF_NAME = "MFLUX ";
 
         bool m_is_logging_to_std = false;
         bool m_is_verbose = false;
 
         std::string m_name = app_NAME;
         std::string m_version = app_VERSION;
-        std::string m_description = app_DESCRIPTION;
 
         std::shared_ptr<felidae::Configurator> m_config = nullptr;
         std::unique_ptr<felidae::Engine> m_engine = nullptr;
