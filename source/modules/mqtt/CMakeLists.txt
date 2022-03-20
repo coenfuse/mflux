@@ -29,12 +29,23 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES 
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
 
-# Linking target with its third-party dependencies
+# Linking target with its module dependencies
 target_link_libraries(${PROJECT_NAME} PRIVATE ${NAMESPACE}::configurator)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${NAMESPACE}::memdb)
+
+# Linking target with its third-party dependencies
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
-# mosquitto
+
+if(WIN32)
+    find_library(mosquitto_lib mosquitto "${CMAKE_SOURCE_DIR}/source/third-party/mosquitto/lib/win32/")
+    target_link_libraries(${PROJECT_NAME} PRIVATE mosquitto_lib)
+    target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/third-party/mosquitto/include")
+elseif(UNIX)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(Mosquitto REQUIRED IMPORTED_TARGET libmosquitto)
+    target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::Moqsuitto)
+endif()
 
 # Building unit tests for target if enabled
 # if(MQTT_BUILD_TESTS OR BUILD_TESTS)
