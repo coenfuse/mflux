@@ -32,20 +32,34 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/c
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
 
-# Linking target with its modules or library depdencies (PRIVATE / PUBLIC / INTERFACE)
+# Linking target with its modules depdencies (PRIVATE / PUBLIC / INTERFACE)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::configurator)
-target_link_libraries(${PROJECT_NAME} PUBLIC CLI11::CLI11)
-target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::influx)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::memdb)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::minix)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${NAMESPACE}::mqtt)
+
+# Linking target with its thirdparty depdencies (PRIVATE / PUBLIC / INTERFACE)
+target_link_libraries(${PROJECT_NAME} PUBLIC CLI11::CLI11)
+target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog_header_only)
 
 # Creating an executable that links to its library equivalent that we made above.
 # This is vital in creating a testing target for this target.
 add_executable("${PROJECT_NAME}-main" "src/main.cpp")
 target_link_libraries("${PROJECT_NAME}-main" PRIVATE ${PROJECT_NAME})
+
+# Adding mosquitto DLLs to build directory
+if(WIN32)
+    file(GLOB MOSQUITTO_DLLS "${CMAKE_SOURCE_DIR}/source/thirdparty/mosquitto/dll/win64/*.dll")
+    
+    foreach(DLL ${MOSQUITTO_DLLS})
+        add_custom_command(
+            TARGET "${PROJECT_NAME}-main" POST_BUILD 
+            COMMAND ${CMAKE_COMMAND} -E copy ${DLL} ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/ 
+            COMMENT "Copying dll : ${DLL}")
+    endforeach()
+endif()
 
 # Adding this built exe target to the same solution level folder
 set_target_properties("${PROJECT_NAME}-main" PROPERTIES FOLDER "apps")
