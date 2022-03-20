@@ -38,13 +38,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
 
 if(WIN32)
-    find_library(mosquitto_lib mosquitto "${CMAKE_SOURCE_DIR}/source/third-party/mosquitto/lib/win32/")
-    target_link_libraries(${PROJECT_NAME} PRIVATE mosquitto_lib)
-    target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/third-party/mosquitto/include")
+    find_library(mosquitto_lib mosquitto "${CMAKE_SOURCE_DIR}/source/thirdparty/mosquitto/lib/win64/")
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${mosquitto_lib})
+	target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/thirdparty/mosquitto/include")
 elseif(UNIX)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(Mosquitto REQUIRED IMPORTED_TARGET libmosquitto)
-    target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::Moqsuitto)
+    target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::Mosquitto)
 endif()
 
 # Building unit tests for target if enabled
