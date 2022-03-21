@@ -3,8 +3,9 @@
 
 
 // standard includes
+#include <atomic>
 #include <memory>
-
+#include <thread>
 
 // internal includes
 // ..
@@ -87,7 +88,7 @@ namespace felidae
 
 			static constexpr const char* SELF_NAME = "MQTT  ";
 
-			std::atomic_bool m_signalled_stop = true;
+			std::atomic_bool m_signalled_stop;
 			std::thread m_worker;
 
 			std::shared_ptr<Configurator> m_pConfig;
