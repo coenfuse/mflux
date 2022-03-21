@@ -25,18 +25,32 @@ namespace felidae
 		Client::Client(void):
 			m_signalled_stop(true),
 			m_pBuffer(nullptr),
-			m_pConfig(nullptr)
+			m_pConfig(nullptr),
+			m_pMosq(nullptr),
+			m_is_mosq_initialized(false)
 		{}
 
 		Client::~Client(void)
 		{}
 
 
-		ERC Client::connect(void)
+		ERC Client::connect(
+			std::string client_id,
+			std::string host, 
+			int port, 
+			std::string username, 
+			std::string password, 
+			int timeout_s = 60)
 		{
 			auto status = ERC::SUCCESS;
 
-			// ..
+			// initialize mosquitto library
+			if(!m_is_mosq_initialized)
+				this->initialize();
+
+			// connect async to mqtt
+
+			// set reconnection thread
 
 			return status;
 		}
@@ -69,7 +83,12 @@ namespace felidae
 			return status;
 		}
 
-		ERC Client::subscribe(void)
+		ERC Client::subscribe(
+			std::string topic,
+			int qos = 0,
+			bool retain = false,
+			std::function<void(void)> callback = nullptr
+		)
 		{
 			auto status = ERC::SUCCESS;
 
@@ -99,9 +118,31 @@ namespace felidae
 				m_pConfig = p_config;
 				m_pBuffer = p_buffer;
 
-
 				if ((m_pConfig == nullptr) || (m_pBuffer == nullptr))
 					status = ERC::NULLPTR_RECV;
+
+				if(status == ERC::SUCCESS)
+					status = this->connect(
+						m_pConfig->get_mqtt_client_name(),
+						m_pConfig->get_mqtt_host(),
+						m_pConfig->get_mqtt_port(),
+						m_pConfig->get_mqtt_username(),
+						m_pConfig->get_mqtt_password(),
+						m_pConfig->get_mqtt_timeout_s()
+					);
+
+				// set network monitor
+				if(status == ERC::SUCCESS)
+					status = ERC::SUCCESS;
+
+				// subscribe to topics
+				if(status == ERC::SUCCESS)
+					for (auto subscription : m_pConfig->get_mqtt_sub_list())
+						status = this->subscribe(
+							subscription.get_topic(), 
+							subscription.get_qos(), 
+							subscription.get_to_retain()
+						);
 
 				if (status == ERC::SUCCESS)
 					m_worker = std::thread(s_service_wrapper, this);
@@ -144,6 +185,25 @@ namespace felidae
 
 		// PRIVATE DEFINITIONS
 		// ------------------------------------------------------
+
+		ERC Client::initialize(void)
+		{
+			auto status = ERC::SUCCESS;
+
+			if(mosquitto_lib_init() != MOSQ_ERR_SUCCESS)
+				status = ERC::MEMORY_ALLOCATION_FAILED;
+			
+			// create mosquitto instance
+			m_pMosq = mosquitto_new(nullptr, true, nullptr);
+
+			// set mosquitto credentials
+
+			// set mosquitto callbacks
+
+			// update initialization flag
+
+			return status;
+		}
 
 		void Client::i_actual_job(void)
 		{

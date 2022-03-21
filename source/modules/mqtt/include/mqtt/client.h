@@ -4,6 +4,7 @@
 
 // standard includes
 #include <atomic>
+#include <map>
 #include <memory>
 #include <thread>
 
@@ -23,7 +24,8 @@
 
 
 // forward references
-// ..
+struct mosquitto;
+struct mosquitto_message;
 
 
 
@@ -49,7 +51,13 @@ namespace felidae
 			~Client(void);
 
 			// TODO : Docs
-			ERC connect(void);
+			ERC connect(
+				std::string client_id,
+				std::string host, 
+				int port, 
+				std::string username, 
+				std::string password, 
+				int timeout_s = 60);
 
 			// TODO : Docs
 			ERC disconnect(void);
@@ -62,7 +70,12 @@ namespace felidae
 			ERC publish(void);
 			
 			// TODO : Docs
-			ERC subscribe(void);
+			ERC subscribe(
+				std::string topic,
+				int qos = 0,
+				bool retain = false,
+				std::function<void(void)> callback = nullptr
+			);
 			
 			// TODO : Docs
 			ERC unsubscribe(void);
@@ -80,6 +93,9 @@ namespace felidae
 		private:
 
 			// TODO : Docs
+			ERC initialize(void);
+
+			// TODO : Docs
 			static void s_service_wrapper(void* instance);
 			
 			// TODO : Docs
@@ -94,6 +110,11 @@ namespace felidae
 
 			std::shared_ptr<Configurator> m_pConfig;
 			std::shared_ptr<MemDB> m_pBuffer;
+
+			// mosquitto attributes
+			mosquitto* m_pMosq;
+
+			bool m_is_mosq_initialized;
 		};
 	}
 }
