@@ -53,6 +53,7 @@ namespace felidae
 			// TODO : Docs
 			ERC connect(
 				std::string client_id,
+				bool is_clean,
 				std::string host, 
 				int port, 
 				std::string username, 

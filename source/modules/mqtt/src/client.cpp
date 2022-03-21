@@ -36,6 +36,7 @@ namespace felidae
 
 		ERC Client::connect(
 			std::string client_id,
+			bool is_clean,
 			std::string host, 
 			int port, 
 			std::string username, 
@@ -124,6 +125,7 @@ namespace felidae
 				if(status == ERC::SUCCESS)
 					status = this->connect(
 						m_pConfig->get_mqtt_client_name(),
+						m_pConfig->is_mqtt_clean(),
 						m_pConfig->get_mqtt_host(),
 						m_pConfig->get_mqtt_port(),
 						m_pConfig->get_mqtt_username(),
