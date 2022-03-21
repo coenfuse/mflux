@@ -69,7 +69,7 @@ void setupSignalHandlers()
 
 
 	// Ctrl-Break sequence
-	signal(SIGBREAK, [](int signal) {});
+	// signal(SIGBREAK, [](int signal) {});
 }
 
 
