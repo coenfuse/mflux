@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "request": "launch",
+            "type": "cppdbg",
+            "program": "${workspaceFolder}/out/build/source/apps/mflux/mflux-main",
+            "args": [
+                "--config",
+                "${workspaceFolder}/source/.config/mflux.config.jsonc",
+                "--stdout",
+                "-v"
+            ],
+            "stopAtEntry":false,
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "build"
+        }
+    ]
+}
