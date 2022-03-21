@@ -12,7 +12,7 @@
 
 
 // thirdparty includes
-// mosquitto
+#include "mosquitto.h"
 #include "spdlog/spdlog.h"
 
 
@@ -22,7 +22,10 @@ namespace felidae
 	namespace mqtt
 	{
 		
-		Client::Client(void)
+		Client::Client(void):
+			m_signalled_stop(true),
+			m_pBuffer(nullptr),
+			m_pConfig(nullptr)
 		{}
 
 		Client::~Client(void)
@@ -95,6 +98,7 @@ namespace felidae
 
 				m_pConfig = p_config;
 				m_pBuffer = p_buffer;
+
 
 				if ((m_pConfig == nullptr) || (m_pBuffer == nullptr))
 					status = ERC::NULLPTR_RECV;
