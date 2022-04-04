@@ -95,7 +95,7 @@ namespace felidae
 			std::string topic,
 			uint8_t qos,
 			bool retain,
-			std::function<void(void)> callback
+			std::function<void(const mosquitto_message*)> callback
 		)
 		{
 			auto status = ERC::SUCCESS;
@@ -150,7 +150,22 @@ namespace felidae
 						status = this->subscribe(
 							subscription.get_topic(), 
 							subscription.get_qos(), 
-							subscription.get_to_retain()
+							subscription.get_to_retain(),
+							[&](const mosquitto_message* msg)
+							{
+								// get mqtt inbox name from configurator
+								auto inbox_name = m_pConfig->get_mqtt_inbox_name();
+
+								// convert mosquitto message to message
+								auto p_message = std::make_shared<Message>(msg);
+
+								// create a db item with message
+								DBitem dbitem;
+								dbitem.set<Message>(*p_message);
+
+								// push db item to buffer
+								m_pBuffer->push(inbox_name, dbitem);
+							}
 						);
 
 				// start service
@@ -225,12 +240,12 @@ namespace felidae
 
 			// set mosquitto callbacks
 			if (status == ERC::SUCCESS)
-				mosquitto_message_callback_set(m_pMosq, nullptr);
-				mosquitto_publish_callback_set(m_pMosq, nullptr);
-				mosquitto_connect_callback_set(m_pMosq, nullptr);
-				mosquitto_disconnect_callback_set(m_pMosq, nullptr);
-				mosquitto_subscribe_callback_set(m_pMosq, nullptr);
-				mosquitto_unsubscribe_callback_set(m_pMosq, nullptr);
+				mosquitto_message_callback_set(m_pMosq, this->s_on_message_wrapper);
+				mosquitto_publish_callback_set(m_pMosq, this->s_on_publish_wrapper);
+				mosquitto_connect_callback_set(m_pMosq, s_on_connect_wrapper);
+				mosquitto_disconnect_callback_set(m_pMosq, s_on_disconnect_wrapper);
+				mosquitto_subscribe_callback_set(m_pMosq, s_on_subscribe_wrapper);
+				mosquitto_unsubscribe_callback_set(m_pMosq, s_on_unsubscribe_wrapper);
 
 			// update initialization flag
 			if (status == ERC::SUCCESS)
@@ -307,6 +322,63 @@ namespace felidae
 			// mosquitto_loop_start() instead
 		}
 
+		void Client::i_on_connect_callback(void* instance, int status)
+		{
+			//if(custom_callback != nullptr)
+			//	custom_callback(status);
+			//else
+				spdlog::debug("{} mosquitto connected", SELF_NAME);
+		}
+
+		void Client::i_on_disconnect_callback(void* instance, int status)
+		{
+			// TODO : Find a way to detect if disconnection was manual or
+			// due to an error. Try reconnecting if the latter is true.
+			spdlog::debug("{} mosquitto disconnected", SELF_NAME);
+		}
+
+		void Client::i_on_subscribe_callback(void* instance, int mid, int qos, const int* granted_qos)
+		{
+			//if(custom_callback != nullptr)
+			//	custom_callback(status);
+			//else
+			spdlog::debug("{} mosquitto subscribed", SELF_NAME);
+		}
+
+		void Client::i_on_unsubscribe_callback(void* instance, int mid)
+		{
+			//if(custom_callback != nullptr)
+			//	custom_callback(status);
+			//else
+			spdlog::debug("{} mosquitto unsubscribed", SELF_NAME);
+		}
+
+		void Client::i_on_publish_callback(void* instance, int mid)
+		{
+			//if(custom_callback != nullptr)
+			//	custom_callback(status);
+			//else
+			spdlog::debug("{} mosquitto published a message", SELF_NAME);
+		}
+
+		void Client::i_on_message_callback(void* instance, const mosquitto_message* msg)
+		{
+			// get message topic in string
+			std::string topic = std::string(msg->topic);
+
+			// Check for custom callbacks in callback_index list by topic name
+			if(m_on_message_callbacks.find(topic) != m_on_message_callbacks.end())
+			{
+				// Call custom callback
+				auto callback = m_on_message_callbacks.at(topic);
+				callback(msg);
+			}
+			else
+			{
+				// Call default callback
+				spdlog::debug("{} received a message on topic {}", SELF_NAME, (const char*)msg->topic);
+			}
+		}
 
 
 
@@ -325,37 +397,37 @@ namespace felidae
 			self_instance->i_actual_monitor();					// This thread blocks here
 		}
 
-		void Client::s_on_connect_wrapper(void* instance, int status)
+		void Client::s_on_connect_wrapper(mosquitto* instance, void* obj, int status)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_connect_callback(instance, status);
 		}
 
-		void Client::s_on_disconnect_wrapper(void* instance, int status)
+		void Client::s_on_disconnect_wrapper(mosquitto* instance, void* obj, int status)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_disconnect_callback(instance, status);
 		}
 
-		void Client::s_on_subscribe_wrapper(void* instance, int mid, int qos, const int* granted_qos)
+		void Client::s_on_subscribe_wrapper(mosquitto* instance, void* obj, int mid, int qos, const int* granted_qos)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_subscribe_callback(instance, mid, qos, granted_qos);
 		}
 
-		void Client::s_on_unsubscribe_wrapper(void* instance, int mid)
+		void Client::s_on_unsubscribe_wrapper(mosquitto* instance, void* obj, int mid)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_unsubscribe_callback(instance, mid);
 		}
 
-		void Client::s_on_publish_wrapper(void* instance, int mid)
+		void Client::s_on_publish_wrapper(mosquitto* instance, void* obj, int mid)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_publish_callback(instance, mid);
 		}
 
-		void Client::s_on_message_wrapper(void* instance, const mosquitto_message* msg)
+		void Client::s_on_message_wrapper(mosquitto* instance, void* obj, const mosquitto_message* msg)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_message_callback(instance, msg);

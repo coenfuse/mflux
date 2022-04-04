@@ -75,7 +75,7 @@ namespace felidae
 				std::string topic,
 				uint8_t qos = 0,
 				bool retain = false,
-				std::function<void(void)> callback = nullptr
+				std::function<void(const mosquitto_message*)> callback = nullptr
 			);
 			
 			// TODO : Docs
@@ -111,27 +111,27 @@ namespace felidae
 			void i_actual_monitor(void);
 
 			// TODO : Docs
-			static void s_on_connect_wrapper(void* instance, int status);
+			static void s_on_connect_wrapper(mosquitto* instance, void* obj, int status);
 			void i_on_connect_callback(void* instance, int status);
 
 			// TODO : Docs
-			static void s_on_disconnect_wrapper(void* instance, int status);
+			static void s_on_disconnect_wrapper(mosquitto* instance, void* obj, int status);
 			void i_on_disconnect_callback(void* instance, int status);
 
 			// TODO : Docs
-			static void s_on_subscribe_wrapper(void* instance, int mid, int qos, const int* granted_qos);
+			static void s_on_subscribe_wrapper(mosquitto* instance, void* obj, int mid, int qos, const int* granted_qos);
 			void i_on_subscribe_callback(void* instance, int mid, int qos, const int* granted_qos);
 
 			// TODO : Docs
-			static void s_on_unsubscribe_wrapper(void* instance, int mid);
+			static void s_on_unsubscribe_wrapper(mosquitto* instance, void* obj, int mid);
 			void i_on_unsubscribe_callback(void* instance, int mid);
 
 			// TODO : Docs
-			static void s_on_message_wrapper(void* instance,  const mosquitto_message* msg);
+			static void s_on_message_wrapper(mosquitto* instance,  void* obj, const mosquitto_message* msg);
 			void i_on_message_callback(void* instance, const mosquitto_message* msg);
 
 			// TODO : Docs
-			static void s_on_publish_wrapper(void* instance, int mid);
+			static void s_on_publish_wrapper(mosquitto* instance, void* obj, int mid);
 			void i_on_publish_callback(void* instance, int mid);
 
 		private:
@@ -146,6 +146,11 @@ namespace felidae
 
 			std::atomic_bool m_is_monitoring;
 			std::thread m_monitor_thread;
+
+			std::map<
+				std::string, 
+				std::function<void(const mosquitto_message*)>
+				> m_on_message_callbacks;
 
 			// mosquitto attributes
 			mosquitto* m_pMosq;
