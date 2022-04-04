@@ -27,7 +27,8 @@ namespace felidae
 			m_pBuffer(nullptr),
 			m_pConfig(nullptr),
 			m_pMosq(nullptr),
-			m_is_mosq_initialized(false)
+			m_is_mosq_initialized(false),
+			m_is_mosq_connected(false)
 		{}
 
 		Client::~Client(void)
@@ -41,17 +42,27 @@ namespace felidae
 			int port, 
 			std::string username, 
 			std::string password, 
-			int timeout_s = 60)
+			int timeout_s)
 		{
 			auto status = ERC::SUCCESS;
 
 			// initialize mosquitto library
 			if(!m_is_mosq_initialized)
-				this->initialize();
+				status = this->i_initialize(client_id, is_clean, username, password);
 
 			// connect async to mqtt
+			if (status == ERC::SUCCESS)
+			{
+				if(!m_is_mosq_connected)
+					status = (ERC)(mosquitto_connect_async(m_pMosq, host.c_str(), port, timeout_s));
 
-			// set reconnection thread
+				if(status == ERC::SUCCESS)
+					status = (ERC)(mosquitto_reconnect_async(m_pMosq));
+			}
+
+			// update connecton flag
+			if(status == ERC::SUCCESS)
+				m_is_mosq_connected = true;
 
 			return status;
 		}
@@ -67,11 +78,7 @@ namespace felidae
 
 		bool Client::is_connected(void)
 		{
-			auto status = true;
-
-			// ..
-
-			return status;
+			return m_is_mosq_connected;
 		}
 
 
@@ -86,9 +93,9 @@ namespace felidae
 
 		ERC Client::subscribe(
 			std::string topic,
-			int qos = 0,
-			bool retain = false,
-			std::function<void(void)> callback = nullptr
+			uint8_t qos,
+			bool retain,
+			std::function<void(void)> callback
 		)
 		{
 			auto status = ERC::SUCCESS;
@@ -135,7 +142,7 @@ namespace felidae
 
 				// set network monitor
 				if(status == ERC::SUCCESS)
-					status = ERC::SUCCESS;
+					status = this->start_network_monitor();
 
 				// subscribe to topics
 				if(status == ERC::SUCCESS)
@@ -146,6 +153,7 @@ namespace felidae
 							subscription.get_to_retain()
 						);
 
+				// start service
 				if (status == ERC::SUCCESS)
 					m_worker = std::thread(s_service_wrapper, this);
 
@@ -188,21 +196,45 @@ namespace felidae
 		// PRIVATE DEFINITIONS
 		// ------------------------------------------------------
 
-		ERC Client::initialize(void)
+		ERC Client::i_initialize(
+			std::string client_id,
+			bool is_clean,
+			std::string username, 
+			std::string password)
 		{
 			auto status = ERC::SUCCESS;
 
 			if(mosquitto_lib_init() != MOSQ_ERR_SUCCESS)
 				status = ERC::MEMORY_ALLOCATION_FAILED;
 			
-			// create mosquitto instance
-			m_pMosq = mosquitto_new(nullptr, true, nullptr);
+			// allocate new mosquitto instance
+			if (status == ERC::SUCCESS)
+				m_pMosq = mosquitto_new(client_id.c_str(), is_clean, nullptr);
+			
+			// check allocation status
+			if (m_pMosq == nullptr)
+				status = ERC::MEMORY_ALLOCATION_FAILED;
 
 			// set mosquitto credentials
+			if (status == ERC::SUCCESS)
+			{
+				auto uid_cstr = username.c_str();
+				auto pwd_cstr = password.c_str();
+				status = (ERC)(mosquitto_username_pw_set(m_pMosq, uid_cstr, pwd_cstr));
+			}
 
 			// set mosquitto callbacks
+			if (status == ERC::SUCCESS)
+				mosquitto_message_callback_set(m_pMosq, nullptr);
+				mosquitto_publish_callback_set(m_pMosq, nullptr);
+				mosquitto_connect_callback_set(m_pMosq, nullptr);
+				mosquitto_disconnect_callback_set(m_pMosq, nullptr);
+				mosquitto_subscribe_callback_set(m_pMosq, nullptr);
+				mosquitto_unsubscribe_callback_set(m_pMosq, nullptr);
 
 			// update initialization flag
+			if (status == ERC::SUCCESS)
+				m_is_mosq_initialized = true;
 
 			return status;
 		}
@@ -235,12 +267,100 @@ namespace felidae
 				// Take a break for a while
 				std::this_thread::sleep_for(std::chrono::seconds(3));
 			}
+
+			//return status;
 		}
-		
+
+		ERC Client::start_network_monitor(void)
+		{
+			ERC status = ERC::SUCCESS;
+
+			if(!m_is_monitoring)
+			{
+				spdlog::debug("{} network monitor starting", SELF_NAME);
+
+				m_is_monitoring.exchange(true);
+				m_monitor_thread = std::thread(s_network_monitor_wrapper, this);
+				
+				// Wait for monitor to start
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				m_is_monitoring = !m_monitor_thread.joinable();
+
+				spdlog::debug("{} network monitor started", SELF_NAME);
+			}
+
+			return status;
+		}
+
+		void Client::i_actual_monitor(void)
+		{
+			spdlog::debug("{} started network monitoring", SELF_NAME);
+
+			while(m_is_monitoring)
+			{
+				mosquitto_loop(m_pMosq, 100, 1);
+			}
+
+			spdlog::debug("{} stopped network monitoring", SELF_NAME);
+
+			// TODO : Consider usage of mosquitto_loop_forever() and 
+			// mosquitto_loop_start() instead
+		}
+
+
+
+
+		// STATIC DEFINITIONS
+		// ------------------------------------------------------
+
 		void Client::s_service_wrapper(void* instance)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_actual_job();						// This thread blocks here
 		}
-	}
-}
+
+		void Client::s_network_monitor_wrapper(void* instance)
+		{
+			Client* self_instance = (Client*)instance;
+			self_instance->i_actual_monitor();					// This thread blocks here
+		}
+
+		void Client::s_on_connect_wrapper(void* instance, int status)
+		{
+			Client* self_instance = (Client*)instance;
+			self_instance->i_on_connect_callback(instance, status);
+		}
+
+		void Client::s_on_disconnect_wrapper(void* instance, int status)
+		{
+			Client* self_instance = (Client*)instance;
+			self_instance->i_on_disconnect_callback(instance, status);
+		}
+
+		void Client::s_on_subscribe_wrapper(void* instance, int mid, int qos, const int* granted_qos)
+		{
+			Client* self_instance = (Client*)instance;
+			self_instance->i_on_subscribe_callback(instance, mid, qos, granted_qos);
+		}
+
+		void Client::s_on_unsubscribe_wrapper(void* instance, int mid)
+		{
+			Client* self_instance = (Client*)instance;
+			self_instance->i_on_unsubscribe_callback(instance, mid);
+		}
+
+		void Client::s_on_publish_wrapper(void* instance, int mid)
+		{
+			Client* self_instance = (Client*)instance;
+			self_instance->i_on_publish_callback(instance, mid);
+		}
+
+		void Client::s_on_message_wrapper(void* instance, const mosquitto_message* msg)
+		{
+			Client* self_instance = (Client*)instance;
+			self_instance->i_on_message_callback(instance, msg);
+		}
+
+	}	// namespace mqtt
+
+}	// namespace felidae

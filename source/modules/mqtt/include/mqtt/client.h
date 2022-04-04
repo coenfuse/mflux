@@ -53,11 +53,11 @@ namespace felidae
 			// TODO : Docs
 			ERC connect(
 				std::string client_id,
-				bool is_clean,
-				std::string host, 
-				int port, 
-				std::string username, 
-				std::string password, 
+				bool is_clean = true,
+				std::string host = "localhost", 
+				int port = 1883, 
+				std::string username = "", 
+				std::string password = "", 
 				int timeout_s = 60);
 
 			// TODO : Docs
@@ -66,14 +66,14 @@ namespace felidae
 			// TODO : Docs
 			bool is_connected(void);
 
-			
+
 			// TODO : Docs
 			ERC publish(void);
 			
 			// TODO : Docs
 			ERC subscribe(
 				std::string topic,
-				int qos = 0,
+				uint8_t qos = 0,
 				bool retain = false,
 				std::function<void(void)> callback = nullptr
 			);
@@ -94,13 +94,45 @@ namespace felidae
 		private:
 
 			// TODO : Docs
-			ERC initialize(void);
+			ERC i_initialize(
+				std::string client_id,
+				bool is_clean, 
+				std::string username, 
+				std::string password
+			);
 
 			// TODO : Docs
 			static void s_service_wrapper(void* instance);
-			
-			// TODO : Docs
 			void i_actual_job(void);
+
+			// TODO : Docs
+			ERC start_network_monitor(void);
+			static void s_network_monitor_wrapper(void* instance);
+			void i_actual_monitor(void);
+
+			// TODO : Docs
+			static void s_on_connect_wrapper(void* instance, int status);
+			void i_on_connect_callback(void* instance, int status);
+
+			// TODO : Docs
+			static void s_on_disconnect_wrapper(void* instance, int status);
+			void i_on_disconnect_callback(void* instance, int status);
+
+			// TODO : Docs
+			static void s_on_subscribe_wrapper(void* instance, int mid, int qos, const int* granted_qos);
+			void i_on_subscribe_callback(void* instance, int mid, int qos, const int* granted_qos);
+
+			// TODO : Docs
+			static void s_on_unsubscribe_wrapper(void* instance, int mid);
+			void i_on_unsubscribe_callback(void* instance, int mid);
+
+			// TODO : Docs
+			static void s_on_message_wrapper(void* instance,  const mosquitto_message* msg);
+			void i_on_message_callback(void* instance, const mosquitto_message* msg);
+
+			// TODO : Docs
+			static void s_on_publish_wrapper(void* instance, int mid);
+			void i_on_publish_callback(void* instance, int mid);
 
 		private:
 
@@ -112,10 +144,14 @@ namespace felidae
 			std::shared_ptr<Configurator> m_pConfig;
 			std::shared_ptr<MemDB> m_pBuffer;
 
+			std::atomic_bool m_is_monitoring;
+			std::thread m_monitor_thread;
+
 			// mosquitto attributes
 			mosquitto* m_pMosq;
 
 			bool m_is_mosq_initialized;
+			bool m_is_mosq_connected;
 		};
 	}
 }
