@@ -10,7 +10,7 @@
 
 
 // internal includes
-// ..
+#include "message.h"
 
 
 // module includes
@@ -128,11 +128,15 @@ namespace felidae
 
 			// TODO : Docs
 			static void s_on_message_wrapper(mosquitto* instance,  void* obj, const mosquitto_message* msg);
-			void i_on_message_callback(void* instance, const mosquitto_message* msg);
+			void i_on_message_callback(const mosquitto_message* msg);
 
 			// TODO : Docs
 			static void s_on_publish_wrapper(mosquitto* instance, void* obj, int mid);
 			void i_on_publish_callback(void* instance, int mid);
+
+			// TODO : Docs
+			// static void s_mflux_sub_event_wrapper(const Message msg);
+			// void i_mflux_sub_event_callback(const Message msg);
 
 		private:
 
@@ -147,6 +151,7 @@ namespace felidae
 			std::atomic_bool m_is_monitoring;
 			std::thread m_monitor_thread;
 
+			// HACK : Static variable
 			std::map<
 				std::string, 
 				std::function<void(const mosquitto_message*)>

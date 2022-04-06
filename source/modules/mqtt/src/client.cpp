@@ -1,5 +1,5 @@
 // standard includes
-// ..
+#include <memory>
 
 
 // internal includes
@@ -21,7 +21,15 @@ namespace felidae
 {
 	namespace mqtt
 	{
-		
+		// Static attribute declaration
+		/*
+		std::map<
+			std::string, 
+			std::function<void(const mosquitto_message*)>> 
+			Client::m_on_message_callbacks = {};
+		*/
+		std::map<std::string, std::function<void(const struct mosquitto_message*)>> callback_table = {};
+
 		Client::Client(void):
 			m_signalled_stop(true),
 			m_pBuffer(nullptr),
@@ -100,7 +108,26 @@ namespace felidae
 		{
 			auto status = ERC::SUCCESS;
 
-			// ..
+			status = (ERC)(mosquitto_subscribe(m_pMosq, nullptr, topic.c_str(), (int)qos));
+
+			if(status == ERC::SUCCESS)
+			{
+				if(callback != nullptr)
+				{
+					callback_table[topic] = callback;
+					//m_on_message_callbacks[topic] = callback;
+					spdlog::debug("{} subscribed to topic {} with callback", SELF_NAME, topic);
+					//spdlog::debug("{} size of callback table is now {}", SELF_NAME, m_on_message_callbacks.size());
+				}
+				else
+				{
+					spdlog::debug("{} subscribed to topic {} w/o callback", SELF_NAME, topic);
+				}
+			}
+			else
+			{
+				spdlog::warn("{} failed to subscribe to topic {}", SELF_NAME, topic);
+			}
 
 			return status;
 		}
@@ -144,7 +171,7 @@ namespace felidae
 				if(status == ERC::SUCCESS)
 					status = this->start_network_monitor();
 
-				// subscribe to topics
+				// subscribe to topics (TODO : Add break when subscribe fails)
 				if(status == ERC::SUCCESS)
 					for (auto subscription : m_pConfig->get_mqtt_sub_list())
 						status = this->subscribe(
@@ -156,12 +183,26 @@ namespace felidae
 								// get mqtt inbox name from configurator
 								auto inbox_name = m_pConfig->get_mqtt_inbox_name();
 
-								// convert mosquitto message to message
-								auto p_message = std::make_shared<Message>(msg);
+								// convert Message from mosquitto_message
+								Message msg_obj;
+								auto payload = (std::string)(const char*)msg->payload;
+
+								msg_obj.set_to_retain(false);
+								msg_obj.set_payload(payload);
+								msg_obj.set_topic(msg->topic);
+								msg_obj.set_qos(msg->qos);
+
+								spdlog::debug("{} received msg with topic: {} payload: {} qos: {} retention: {}", 
+									SELF_NAME,
+									msg_obj.get_topic(), 
+									msg_obj.get_payload(), 
+									msg_obj.get_qos(), 
+									msg_obj.get_to_retain()
+								);
 
 								// create a db item with message
 								DBitem dbitem;
-								dbitem.set<Message>(*p_message);
+								dbitem.set<Message>(msg_obj);
 
 								// push db item to buffer
 								m_pBuffer->push(inbox_name, dbitem);
@@ -192,8 +233,21 @@ namespace felidae
 			{
 				spdlog::debug("{} service stopping", SELF_NAME);
 
+				// stop service
 				m_signalled_stop.exchange(true);
 				m_worker.join();
+
+				// unsubscribe from topics
+				// ..
+
+				// stop network monitor
+				// ..
+
+				// disconnect from broker
+				// ..
+
+				// deallocate config and buffer pointers
+				// ..
 
 				spdlog::info("{} service stopped", SELF_NAME);
 			}
@@ -240,8 +294,8 @@ namespace felidae
 
 			// set mosquitto callbacks
 			if (status == ERC::SUCCESS)
-				mosquitto_message_callback_set(m_pMosq, this->s_on_message_wrapper);
-				mosquitto_publish_callback_set(m_pMosq, this->s_on_publish_wrapper);
+				mosquitto_message_callback_set(m_pMosq, s_on_message_wrapper);
+				mosquitto_publish_callback_set(m_pMosq, s_on_publish_wrapper);
 				mosquitto_connect_callback_set(m_pMosq, s_on_connect_wrapper);
 				mosquitto_disconnect_callback_set(m_pMosq, s_on_disconnect_wrapper);
 				mosquitto_subscribe_callback_set(m_pMosq, s_on_subscribe_wrapper);
@@ -266,6 +320,7 @@ namespace felidae
 
 			while (!m_signalled_stop)
 			{
+				/*
 				srand(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
 				mqtt_msg.set_topic("BASSAI");
@@ -281,6 +336,7 @@ namespace felidae
 
 				// Take a break for a while
 				std::this_thread::sleep_for(std::chrono::seconds(3));
+				*/
 			}
 
 			//return status;
@@ -294,7 +350,6 @@ namespace felidae
 			{
 				spdlog::debug("{} network monitor starting", SELF_NAME);
 
-				m_is_monitoring.exchange(true);
 				m_monitor_thread = std::thread(s_network_monitor_wrapper, this);
 				
 				// Wait for monitor to start
@@ -311,7 +366,8 @@ namespace felidae
 		{
 			spdlog::debug("{} started network monitoring", SELF_NAME);
 
-			while(m_is_monitoring)
+			m_is_monitoring.exchange(true);
+			while(true)
 			{
 				mosquitto_loop(m_pMosq, 100, 1);
 			}
@@ -361,19 +417,22 @@ namespace felidae
 			spdlog::debug("{} mosquitto published a message", SELF_NAME);
 		}
 
-		void Client::i_on_message_callback(void* instance, const mosquitto_message* msg)
+		void Client::i_on_message_callback(const mosquitto_message* msg)
 		{
 			// get message topic in string
-			std::string topic = std::string(msg->topic);
-
+			const std::string topic = std::string(msg->topic);
+			
+			//spdlog::debug("{} received a message from topic {}", SELF_NAME, topic);
+			//spdlog::debug("{} callback table size {}", SELF_NAME, m_on_message_callbacks.size());
+			
 			// Check for custom callbacks in callback_index list by topic name
-			if(m_on_message_callbacks.find(topic) != m_on_message_callbacks.end())
-			{
-				// Call custom callback
-				auto callback = m_on_message_callbacks.at(topic);
-				callback(msg);
-			}
-			else
+			//if(m_on_message_callbacks.find(topic) != m_on_message_callbacks.end())
+			//{
+			//	// Call custom callback
+			//	auto callback = m_on_message_callbacks.at(topic);
+			//	callback(msg);
+			//}
+			//else
 			{
 				// Call default callback
 				spdlog::debug("{} received a message on topic {}", SELF_NAME, (const char*)msg->topic);
@@ -429,8 +488,12 @@ namespace felidae
 
 		void Client::s_on_message_wrapper(mosquitto* instance, void* obj, const mosquitto_message* msg)
 		{
-			Client* self_instance = (Client*)instance;
-			self_instance->i_on_message_callback(instance, msg);
+			spdlog::debug("Callback wrapper invoked");
+			auto callback = callback_table.at(std::string(msg->topic));
+			callback(msg);
+
+			//Client* self_ref = static_cast<Client*>(obj);
+			//self_ref->i_on_message_callback(msg);
 		}
 
 	}	// namespace mqtt
