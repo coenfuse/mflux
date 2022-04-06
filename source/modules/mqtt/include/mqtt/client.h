@@ -46,6 +46,9 @@ namespace felidae
 		class Client
 		{
 		public:
+
+			// TODO : Docs and remove dependency on mosquitto_message, use mqtt::Message instead
+			using msg_callback_t = std::function<void(const struct mosquitto_message*)>;
 			
 			Client(void);
 			~Client(void);
@@ -75,7 +78,7 @@ namespace felidae
 				std::string topic,
 				uint8_t qos = 0,
 				bool retain = false,
-				std::function<void(const mosquitto_message*)> callback = nullptr
+				msg_callback_t callback = nullptr
 			);
 			
 			// TODO : Docs
@@ -134,10 +137,6 @@ namespace felidae
 			static void s_on_publish_wrapper(mosquitto* instance, void* obj, int mid);
 			void i_on_publish_callback(void* instance, int mid);
 
-			// TODO : Docs
-			// static void s_mflux_sub_event_wrapper(const Message msg);
-			// void i_mflux_sub_event_callback(const Message msg);
-
 		private:
 
 			static constexpr const char* SELF_NAME = "MQTT  ";
@@ -151,11 +150,9 @@ namespace felidae
 			std::atomic_bool m_is_monitoring;
 			std::thread m_monitor_thread;
 
-			// HACK : Static variable
-			std::map<
-				std::string, 
-				std::function<void(const mosquitto_message*)>
-				> m_on_message_callbacks;
+			// BUG : The program seem to only work when this 
+			// unused variable is declared
+			std::map<std::string, msg_callback_t> void_callback;
 
 			// mosquitto attributes
 			mosquitto* m_pMosq;

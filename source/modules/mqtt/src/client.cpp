@@ -21,14 +21,9 @@ namespace felidae
 {
 	namespace mqtt
 	{
-		// Static attribute declaration
-		/*
-		std::map<
-			std::string, 
-			std::function<void(const mosquitto_message*)>> 
-			Client::m_on_message_callbacks = {};
-		*/
-		std::map<std::string, std::function<void(const struct mosquitto_message*)>> callback_table = {};
+		// Static / Global attributes declaration
+		// TODO : Docs, it is a patch work
+		std::map<std::string, Client::msg_callback_t> g_on_msg_callback_table = {};
 
 		Client::Client(void):
 			m_signalled_stop(true),
@@ -103,7 +98,7 @@ namespace felidae
 			std::string topic,
 			uint8_t qos,
 			bool retain,
-			std::function<void(const mosquitto_message*)> callback
+			msg_callback_t callback
 		)
 		{
 			auto status = ERC::SUCCESS;
@@ -114,19 +109,17 @@ namespace felidae
 			{
 				if(callback != nullptr)
 				{
-					callback_table[topic] = callback;
-					//m_on_message_callbacks[topic] = callback;
-					spdlog::debug("{} subscribed to topic {} with callback", SELF_NAME, topic);
-					//spdlog::debug("{} size of callback table is now {}", SELF_NAME, m_on_message_callbacks.size());
+					g_on_msg_callback_table[topic] = callback;
+					spdlog::debug("{} subscribed to topic '{}' with callback", SELF_NAME, topic);
 				}
 				else
 				{
-					spdlog::debug("{} subscribed to topic {} w/o callback", SELF_NAME, topic);
+					spdlog::debug("{} subscribed to topic '{}' w/o callback", SELF_NAME, topic);
 				}
 			}
 			else
 			{
-				spdlog::warn("{} failed to subscribe to topic {}", SELF_NAME, topic);
+				spdlog::warn("{} failed to subscribe to topic '{}'", SELF_NAME, topic);
 			}
 
 			return status;
@@ -192,7 +185,7 @@ namespace felidae
 								msg_obj.set_topic(msg->topic);
 								msg_obj.set_qos(msg->qos);
 
-								spdlog::debug("{} received msg with topic: {} payload: {} qos: {} retention: {}", 
+								spdlog::trace("{} processing received msg with topic: {} payload: {} qos: {} retention: {}", 
 									SELF_NAME,
 									msg_obj.get_topic(), 
 									msg_obj.get_payload(), 
@@ -294,12 +287,14 @@ namespace felidae
 
 			// set mosquitto callbacks
 			if (status == ERC::SUCCESS)
+			{
 				mosquitto_message_callback_set(m_pMosq, s_on_message_wrapper);
 				mosquitto_publish_callback_set(m_pMosq, s_on_publish_wrapper);
 				mosquitto_connect_callback_set(m_pMosq, s_on_connect_wrapper);
 				mosquitto_disconnect_callback_set(m_pMosq, s_on_disconnect_wrapper);
 				mosquitto_subscribe_callback_set(m_pMosq, s_on_subscribe_wrapper);
 				mosquitto_unsubscribe_callback_set(m_pMosq, s_on_unsubscribe_wrapper);
+			}
 
 			// update initialization flag
 			if (status == ERC::SUCCESS)
@@ -334,9 +329,9 @@ namespace felidae
 				
 				spdlog::trace("Sent     {} payload: {} qos: {} retention: {}", mqtt_msg.get_topic(), mqtt_msg.get_payload(), mqtt_msg.get_qos(), mqtt_msg.get_to_retain());
 
+				*/
 				// Take a break for a while
 				std::this_thread::sleep_for(std::chrono::seconds(3));
-				*/
 			}
 
 			//return status;
@@ -367,6 +362,8 @@ namespace felidae
 			spdlog::debug("{} started network monitoring", SELF_NAME);
 
 			m_is_monitoring.exchange(true);
+
+			// TODO : Remove this always on condition, use do-while instead?
 			while(true)
 			{
 				mosquitto_loop(m_pMosq, 100, 1);
@@ -419,23 +416,26 @@ namespace felidae
 
 		void Client::i_on_message_callback(const mosquitto_message* msg)
 		{
-			// get message topic in string
-			const std::string topic = std::string(msg->topic);
-			
-			//spdlog::debug("{} received a message from topic {}", SELF_NAME, topic);
-			//spdlog::debug("{} callback table size {}", SELF_NAME, m_on_message_callbacks.size());
-			
-			// Check for custom callbacks in callback_index list by topic name
-			//if(m_on_message_callbacks.find(topic) != m_on_message_callbacks.end())
-			//{
-			//	// Call custom callback
-			//	auto callback = m_on_message_callbacks.at(topic);
-			//	callback(msg);
-			//}
-			//else
+			// cache topic into a strig type
+			auto topic = std::string(msg->topic);
+
+			// log
+			spdlog::debug("{} received a message from topic {}", SELF_NAME, topic);
+
+			// search callback table for any callback actions
+			if (g_on_msg_callback_table.find(topic) != g_on_msg_callback_table.end())
 			{
-				// Call default callback
-				spdlog::debug("{} received a message on topic {}", SELF_NAME, (const char*)msg->topic);
+				// retrieve custom callback action
+				auto callback = g_on_msg_callback_table.at(std::string(msg->topic));
+				
+				// perform custom callback action if not null
+				if (callback != nullptr)
+					callback(msg);
+			}
+			else
+			{
+				// perform default action
+				// ..
 			}
 		}
 
@@ -482,18 +482,14 @@ namespace felidae
 
 		void Client::s_on_publish_wrapper(mosquitto* instance, void* obj, int mid)
 		{
-			Client* self_instance = (Client*)instance;
-			self_instance->i_on_publish_callback(instance, mid);
+			auto self_ref = static_cast<Client*>(obj);
+			self_ref->i_on_publish_callback(instance, mid);
 		}
 
 		void Client::s_on_message_wrapper(mosquitto* instance, void* obj, const mosquitto_message* msg)
 		{
-			spdlog::debug("Callback wrapper invoked");
-			auto callback = callback_table.at(std::string(msg->topic));
-			callback(msg);
-
-			//Client* self_ref = static_cast<Client*>(obj);
-			//self_ref->i_on_message_callback(msg);
+			auto self_ref = std::make_unique<Client>();
+			self_ref->i_on_message_callback(msg);
 		}
 
 	}	// namespace mqtt
