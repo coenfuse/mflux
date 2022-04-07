@@ -345,13 +345,42 @@ namespace felidae
 			{
 				spdlog::debug("{} network monitor starting", SELF_NAME);
 
-				m_monitor_thread = std::thread(s_network_monitor_wrapper, this);
+				#ifdef WIN32
+					m_monitor_thread = std::thread(s_network_monitor_wrapper, this);
+					std::this_thread::sleep_for(std::chrono::seconds(2));				// Wait to start up
+					
+					// If thread is joinable, it means it is not running. Hence, failure.
+					status = (m_monitor_thread.joinable()) ? ERC::FAILURE : ERC::SUCCESS;
+				#else
+					status = (ERC)mosquitto_loop_start(m_pMosq);
+					if (status == ERC::SUCCESS)
+						m_is_monitoring = true;
+				#endif
 				
-				// Wait for monitor to start
-				std::this_thread::sleep_for(std::chrono::seconds(1));
-				m_is_monitoring = !m_monitor_thread.joinable();
-
 				spdlog::debug("{} network monitor started", SELF_NAME);
+			}
+
+			return status;
+		}
+
+		ERC Client::stop_network_monitor(void)
+		{
+			ERC status = ERC::SUCCESS;
+
+			if(m_is_monitoring)
+			{
+				spdlog::debug("{} network monitor stopping", SELF_NAME);
+
+				#ifdef WIN32
+					m_is_monitoring.exchange(true);
+					m_monitor_thread.join();											// Wait to stop and join
+				#else
+					status = (ERC)mosquitto_loop_stop(m_pMosq, true);
+					if (status == ERC::SUCCESS)
+						m_is_monitoring = false;
+				#endif
+
+				spdlog::debug("{} network monitor stopped", SELF_NAME);
 			}
 
 			return status;
@@ -359,20 +388,12 @@ namespace felidae
 
 		void Client::i_actual_monitor(void)
 		{
-			spdlog::debug("{} started network monitoring", SELF_NAME);
-
 			m_is_monitoring.exchange(true);
 
-			// TODO : Remove this always on condition, use do-while instead?
-			while(true)
+			do
 			{
 				mosquitto_loop(m_pMosq, 100, 1);
-			}
-
-			spdlog::debug("{} stopped network monitoring", SELF_NAME);
-
-			// TODO : Consider usage of mosquitto_loop_forever() and 
-			// mosquitto_loop_start() instead
+			} while (m_is_monitoring);
 		}
 
 		void Client::i_on_connect_callback(void* instance, int status)
@@ -419,7 +440,6 @@ namespace felidae
 			// cache topic into a strig type
 			auto topic = std::string(msg->topic);
 
-			// log
 			spdlog::debug("{} received a message from topic {}", SELF_NAME, topic);
 
 			// search callback table for any callback actions
@@ -452,8 +472,8 @@ namespace felidae
 
 		void Client::s_network_monitor_wrapper(void* instance)
 		{
-			Client* self_instance = (Client*)instance;
-			self_instance->i_actual_monitor();					// This thread blocks here
+			auto self_ref = static_cast<Client*>(instance);
+			self_ref->i_actual_monitor();						// This thread blocks here
 		}
 
 		void Client::s_on_connect_wrapper(mosquitto* instance, void* obj, int status)

@@ -110,6 +110,7 @@ namespace felidae
 
 			// TODO : Docs
 			ERC start_network_monitor(void);
+			ERC stop_network_monitor(void);
 			static void s_network_monitor_wrapper(void* instance);
 			void i_actual_monitor(void);
 
