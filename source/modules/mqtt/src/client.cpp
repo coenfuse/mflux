@@ -63,7 +63,15 @@ namespace felidae
 					status = (ERC)(mosquitto_reconnect_async(m_pMosq));
 			}
 
-			// update connecton flag
+			// start mosquitto network monitor
+			if(status == ERC::SUCCESS)
+				status = this->start_network_monitor();
+
+			// NOTE : The network monitor should ideally be started post-init and pre-connect,
+			// but doing so causes a little delay in callbacks invocations. Starting
+			// monitor post connection resolves the issue surprisingly.
+
+			// update connecton flag. There must be some other reliable way of knowing connection status.
 			if(status == ERC::SUCCESS)
 				m_is_mosq_connected = true;
 
@@ -74,7 +82,32 @@ namespace felidae
 		{
 			auto status = ERC::SUCCESS;
 
-			// ..
+			// check connection status before disconnection
+			if(this->is_connected())
+			{
+				status = (ERC)(mosquitto_disconnect(m_pMosq));
+				
+				// update connection flag
+				if(status == ERC::SUCCESS)
+					m_is_mosq_connected = false;
+
+				// stop mosquitto network monitor
+				if(status == ERC::SUCCESS)
+					status = this->stop_network_monitor();
+
+				// destroy mosquitto instance and update init flag
+				if (!m_is_mosq_connected)
+				{
+					mosquitto_destroy(m_pMosq);
+					m_is_mosq_initialized = false;
+				}
+
+				// log
+				if (!m_is_mosq_initialized)
+					spdlog::debug("{} mosquitto instance destroyed", SELF_NAME);
+				else
+					spdlog::error("{} mosquitto instance destruction failed", SELF_NAME);				
+			}
 
 			return status;
 		}
@@ -125,11 +158,23 @@ namespace felidae
 			return status;
 		}
 
-		ERC Client::unsubscribe(void)
+		ERC Client::unsubscribe(std::string topic)
 		{
 			auto status = ERC::SUCCESS;
 
-			// ..
+			// Check connection
+			if (this->is_connected())
+			{
+				bool subscription_exists = false;
+
+				// Find if this subscription exists in callback table
+				if (g_on_msg_callback_table.find(topic) != g_on_msg_callback_table.end())
+					subscription_exists = true;
+
+				// Unsubscribe if subscription exists, else do nothing
+				if (subscription_exists)
+					status = (ERC)(mosquitto_unsubscribe(m_pMosq, nullptr, topic.c_str()));
+			}
 
 			return status;
 		}
@@ -143,12 +188,14 @@ namespace felidae
 			{
 				spdlog::debug("{} service starting", SELF_NAME);
 
+				// allocate config and buffer pointer copies
 				m_pConfig = p_config;
 				m_pBuffer = p_buffer;
 
 				if ((m_pConfig == nullptr) || (m_pBuffer == nullptr))
 					status = ERC::NULLPTR_RECV;
 
+				// connect to broker
 				if(status == ERC::SUCCESS)
 					status = this->connect(
 						m_pConfig->get_mqtt_client_name(),
@@ -159,10 +206,6 @@ namespace felidae
 						m_pConfig->get_mqtt_password(),
 						m_pConfig->get_mqtt_timeout_s()
 					);
-
-				// set network monitor
-				if(status == ERC::SUCCESS)
-					status = this->start_network_monitor();
 
 				// subscribe to topics (TODO : Add break when subscribe fails)
 				if(status == ERC::SUCCESS)
@@ -228,21 +271,29 @@ namespace felidae
 
 				// stop service
 				m_signalled_stop.exchange(true);
-				m_worker.join();
+				m_worker.join();												// Wait to stop and join
 
 				// unsubscribe from topics
-				// ..
-
-				// stop network monitor
-				// ..
+				if(status == ERC::SUCCESS)
+					for (auto subscription : m_pConfig->get_mqtt_sub_list())
+						status = this->unsubscribe(subscription.get_topic());
 
 				// disconnect from broker
-				// ..
+				if(status == ERC::SUCCESS)
+					status = this->disconnect();
 
-				// deallocate config and buffer pointers
-				// ..
+				// deallocate config and buffer pointers copies
+				if(status == ERC::SUCCESS)
+				{
+					m_pConfig = nullptr;
+					m_pBuffer = nullptr;
+				}
 
-				spdlog::info("{} service stopped", SELF_NAME);
+				// log
+				if (status == ERC::SUCCESS)
+					spdlog::info("{} service stopped", SELF_NAME);
+				else
+					spdlog::error("{} service failed to stop with code {}", SELF_NAME, status);
 			}
 
 			return status;
@@ -300,6 +351,12 @@ namespace felidae
 			if (status == ERC::SUCCESS)
 				m_is_mosq_initialized = true;
 
+			// log
+			if (m_is_mosq_initialized)
+				spdlog::debug("{} mosquitto instance initialized", SELF_NAME);
+			else
+				spdlog::error("{} mosquitto instance initialization failed", SELF_NAME);
+
 			return status;
 		}
 
@@ -353,6 +410,8 @@ namespace felidae
 					status = (m_monitor_thread.joinable()) ? ERC::FAILURE : ERC::SUCCESS;
 				#else
 					status = (ERC)mosquitto_loop_start(m_pMosq);
+					std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
 					if (status == ERC::SUCCESS)
 						m_is_monitoring = true;
 				#endif

@@ -82,7 +82,7 @@ namespace felidae
 			);
 			
 			// TODO : Docs
-			ERC unsubscribe(void);
+			ERC unsubscribe(std::string topic);
 
 			
 			// TODO : Docs
