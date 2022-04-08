@@ -12,7 +12,11 @@
 
 
 // thirdparty includes
-#include "mosquitto.h"
+#ifdef WIN32 
+	#include "mosquitto/mosquitto.h"
+#else 
+	#include "mosquitto.h"
+#endif
 #include "spdlog/spdlog.h"
 
 
@@ -403,11 +407,13 @@ namespace felidae
 				spdlog::debug("{} network monitor starting", SELF_NAME);
 
 				#ifdef WIN32
+					m_is_monitoring.exchange(true);
 					m_monitor_thread = std::thread(s_network_monitor_wrapper, this);
-					std::this_thread::sleep_for(std::chrono::seconds(2));				// Wait to start up
 					
-					// If thread is joinable, it means it is not running. Hence, failure.
-					status = (m_monitor_thread.joinable()) ? ERC::FAILURE : ERC::SUCCESS;
+					std::this_thread::sleep_for(std::chrono::milliseconds(500));		// Wait to start up
+					
+					// BUG : If thread is joinable, it means it is not running. Hence, failure.
+					// status = (m_monitor_thread.joinable()) ? ERC::FAILURE : ERC::SUCCESS;
 				#else
 					status = (ERC)mosquitto_loop_start(m_pMosq);
 					std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -416,7 +422,10 @@ namespace felidae
 						m_is_monitoring = true;
 				#endif
 				
-				spdlog::debug("{} network monitor started", SELF_NAME);
+					if (status == ERC::SUCCESS)
+						spdlog::debug("{} network monitor started", SELF_NAME);
+					else
+						spdlog::error("{} network monitor startup failed", SELF_NAME);
 			}
 
 			return status;
@@ -431,7 +440,7 @@ namespace felidae
 				spdlog::debug("{} network monitor stopping", SELF_NAME);
 
 				#ifdef WIN32
-					m_is_monitoring.exchange(true);
+					m_is_monitoring.exchange(false);
 					m_monitor_thread.join();											// Wait to stop and join
 				#else
 					status = (ERC)mosquitto_loop_stop(m_pMosq, true);
@@ -447,12 +456,8 @@ namespace felidae
 
 		void Client::i_actual_monitor(void)
 		{
-			m_is_monitoring.exchange(true);
-
-			do
-			{
+			while (m_is_monitoring)
 				mosquitto_loop(m_pMosq, 100, 1);
-			} while (m_is_monitoring);
 		}
 
 		void Client::i_on_connect_callback(void* instance, int status)
