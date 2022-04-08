@@ -343,6 +343,7 @@ namespace felidae
 			// set mosquitto callbacks
 			if (status == ERC::SUCCESS)
 			{
+				//mosquitto_threaded_set(m_pMosq, this);
 				mosquitto_message_callback_set(m_pMosq, s_on_message_wrapper);
 				mosquitto_publish_callback_set(m_pMosq, s_on_publish_wrapper);
 				mosquitto_connect_callback_set(m_pMosq, s_on_connect_wrapper);
@@ -422,10 +423,10 @@ namespace felidae
 						m_is_monitoring = true;
 				#endif
 				
-					if (status == ERC::SUCCESS)
-						spdlog::debug("{} network monitor started", SELF_NAME);
-					else
-						spdlog::error("{} network monitor startup failed", SELF_NAME);
+				if (status == ERC::SUCCESS)
+					spdlog::debug("{} network monitor started", SELF_NAME);
+				else
+					spdlog::error("{} network monitor startup failed", SELF_NAME);
 			}
 
 			return status;
