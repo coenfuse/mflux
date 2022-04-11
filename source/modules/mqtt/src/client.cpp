@@ -94,11 +94,16 @@ namespace felidae
 		ERC Client::disconnect(void)
 		{
 			auto status = ERC::SUCCESS;
+			int mosq_erc = MOSQ_ERR_SUCCESS;
 
 			// check connection status before disconnection
 			if(this->is_connected())
 			{
-				status = (ERC)(mosquitto_disconnect(m_pMosq));
+				mosq_erc = mosquitto_disconnect(m_pMosq);
+
+				// set client status
+				if (mosq_erc != MOSQ_ERR_SUCCESS)
+					status = ERC::FAILURE;
 				
 				// update connection flag
 				if(status == ERC::SUCCESS)
@@ -109,7 +114,7 @@ namespace felidae
 					status = i_stop_network_monitor();
 
 				// destroy mosquitto instance and update init flag
-				if (!m_is_mosq_connected)
+				if (status == ERC::SUCCESS)
 				{
 					mosquitto_destroy(m_pMosq);
 					m_is_mosq_initialized = false;
@@ -117,9 +122,9 @@ namespace felidae
 
 				// log
 				if (!m_is_mosq_initialized)
-					spdlog::debug("{} mosquitto instance destroyed", SELF_NAME);
+					spdlog::debug("{} mosquitto instance destroy success", SELF_NAME);
 				else
-					spdlog::error("{} mosquitto instance destruction failed", SELF_NAME);				
+					spdlog::error("{} mosquitto instance destroy failure with code {}", SELF_NAME, status);				
 			}
 
 			return status;
@@ -127,6 +132,8 @@ namespace felidae
 
 		bool Client::is_connected(void)
 		{
+			// TODO - Try using a PING mechanism to ensure connection status
+			// instead of relying on an unreliable boolean attribute
 			return m_is_mosq_connected;
 		}
 
@@ -481,7 +488,10 @@ namespace felidae
 		void Client::i_on_disconnect_callback(void* instance, int status)
 		{
 			// TODO - Find a way to detect if disconnection was manual or due to an error. Try reconnecting if the latter is true.
-			spdlog::debug("{} mosquitto disconnected", SELF_NAME);
+			if (status == MOSQ_ERR_SUCCESS)
+				spdlog::debug("{} mosquitto disconnect success", SELF_NAME);
+			else
+				spdlog::error("{} mosquitto disconnect failure with MOSQ_ERR_CODE {}", SELF_NAME, status);
 		}
 
 		void Client::i_on_subscribe_callback(void* instance, int mid, int qos, const int* granted_qos)
