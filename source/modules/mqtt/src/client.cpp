@@ -93,7 +93,7 @@ namespace felidae
 
 		ERC Client::disconnect(void)
 		{
-			auto status = ERC::SUCCESS;
+			auto status  = ERC::SUCCESS;
 			int mosq_erc = MOSQ_ERR_SUCCESS;
 
 			// check connection status before disconnection
@@ -154,7 +154,7 @@ namespace felidae
 			msg_callback_t callback
 		)
 		{
-			auto status = ERC::SUCCESS;
+			auto status  = ERC::SUCCESS;
 			int mosq_erc = MOSQ_ERR_SUCCESS;
 
 			mosq_erc = mosquitto_subscribe(m_pMosq, nullptr, topic.c_str(), (int)qos);
@@ -176,7 +176,7 @@ namespace felidae
 			}
 			else
 			{
-				spdlog::warn("{} subscribe failure to topic '{}' with MOSQ_ERR_CODE {}", SELF_NAME, topic, status, mosq_erc);
+				spdlog::warn("{} subscribe failure to topic '{}' with MOSQ_ERR_CODE {}", SELF_NAME, topic, mosq_erc);
 			}
 
 			return status;
@@ -184,7 +184,8 @@ namespace felidae
 
 		ERC Client::unsubscribe(std::string topic)
 		{
-			auto status = ERC::SUCCESS;
+			auto status  = ERC::SUCCESS;
+			int mosq_erc = MOSQ_ERR_NOT_FOUND;
 
 			// Check connection
 			if (this->is_connected())
@@ -197,7 +198,19 @@ namespace felidae
 
 				// Unsubscribe if subscription exists, else do nothing
 				if (subscription_exists)
-					status = (ERC)(mosquitto_unsubscribe(m_pMosq, nullptr, topic.c_str()));
+					mosq_erc = mosquitto_unsubscribe(m_pMosq, nullptr, topic.c_str());
+
+				// remove subscription from callback table
+				if (mosq_erc == MOSQ_ERR_SUCCESS)
+					g_on_msg_callback_table.erase(topic);
+				else
+					status = ERC::FAILURE;
+
+				// log
+				if(status == ERC::SUCCESS)
+					spdlog::debug("{} unsubscribe success from topic '{}'", SELF_NAME, topic);
+				else
+					spdlog::warn("{} unsubscribe failure from topic '{}' with MOSQ_ERR_CODE {}", SELF_NAME, topic, mosq_erc);
 			}
 
 			return status;
