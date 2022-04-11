@@ -30,23 +30,48 @@ namespace felidae
             Subscription(){}
             ~Subscription(){}
 
-            /// TODO : Docs
+            /// Get the topic name of the subscription object
+            ///
+            /// return topic string
             inline std::string get_topic(void) const;
 
-            /// TODO : Docs
+            /// Set a topic name for this subscription object.
+            ///
+            /// topic - subscription topic string in MQTT specified format. Should be a non-empty string
+            ///
+            /// return ERC.SUCCESS - on success
+            /// return ERC.FAILURE - on invalid topic input
             inline ERC set_topic(std::string topic);
 
-            /// TODO : Docs
+            /// Get the QOS (Quality of service) value of the subcription object
+            ///
+            /// return unsigned int ranging from 0 to 2
             inline uint8_t get_qos(void) const;
 
-            /// TODO : Docs
+            /// Set the QOS (Quality of service) value of the subscription object.
+            /// 
+            /// qos - quality of service level for subscription. Ranges from 0 to 2
+            ///
+            /// return ERC.SUCCESS - on success
+            /// return ERC.FAILURE - on invalid QOS value
             inline ERC set_qos(uint8_t qos);
 
-            // TODO : Docs
+            /// Get retention status for this subscription object.
+            ///
+            /// return TRUE if message retention for this subscription is ON
+            /// return FALSE if message retention for this subscription is OFF
             inline bool get_to_retain(void) const;
 
-            // TODO : Docs
+            /// Set retention status for this subscription object.
+            ///
+            /// to_retain - whether to retain the messages on reconnection for this subscription topic
             inline void set_to_retain(bool to_retain);
+
+            // TODO - define get_callback()
+            // inline void get_callback();
+
+            // TODO - define set_callback()
+            // inline void set_callback();
 
         private:
 

@@ -14,19 +14,20 @@
 // thirdparty includes
 #ifdef WIN32 
 	#include "mosquitto/mosquitto.h"
-#else 
+#else
 	#include "mosquitto.h"
 #endif
 #include "spdlog/spdlog.h"
 
 
+// TODO - Repair ERC overriding for moqsuitto return codes. Do not do mosquitto codes to ERC translation. Return both codes as reponse in error messages.
 
 namespace felidae
 {
 	namespace mqtt
 	{
 		// Static / Global attributes declaration
-		// TODO : Docs, it is a patch work
+		// TODO - Docs, it is a patch work
 		std::map<std::string, Client::msg_callback_t> g_on_msg_callback_table = {};
 
 		Client::Client(void):
@@ -39,11 +40,13 @@ namespace felidae
 		{}
 
 		Client::~Client(void)
-		{}
+		{
+			mosquitto_lib_cleanup();
+		}
 
 
 		ERC Client::connect(
-			std::string client_id,
+			std::string client_name,
 			bool is_clean,
 			std::string host, 
 			int port, 
@@ -55,7 +58,7 @@ namespace felidae
 
 			// initialize mosquitto library
 			if(!m_is_mosq_initialized)
-				status = this->i_initialize(client_id, is_clean, username, password);
+				status = this->i_initialize(client_name, is_clean, username, password);
 
 			// connect async to mqtt
 			if (status == ERC::SUCCESS)
@@ -69,9 +72,9 @@ namespace felidae
 
 			// start mosquitto network monitor
 			if(status == ERC::SUCCESS)
-				status = this->start_network_monitor();
+				status = i_start_network_monitor();
 
-			// NOTE : The network monitor should ideally be started post-init and pre-connect,
+			// The network monitor should ideally be started post-init and pre-connect,
 			// but doing so causes a little delay in callbacks invocations. Starting
 			// monitor post connection resolves the issue surprisingly.
 
@@ -97,7 +100,7 @@ namespace felidae
 
 				// stop mosquitto network monitor
 				if(status == ERC::SUCCESS)
-					status = this->stop_network_monitor();
+					status = i_stop_network_monitor();
 
 				// destroy mosquitto instance and update init flag
 				if (!m_is_mosq_connected)
@@ -251,7 +254,7 @@ namespace felidae
 
 				// start service
 				if (status == ERC::SUCCESS)
-					m_worker = std::thread(s_service_wrapper, this);
+					m_worker = std::thread(si_service_wrapper, this);
 
 				if (this->is_running())
 					status = ERC::SUCCESS;
@@ -314,7 +317,7 @@ namespace felidae
 		// ------------------------------------------------------
 
 		ERC Client::i_initialize(
-			std::string client_id,
+			std::string client_name,
 			bool is_clean,
 			std::string username, 
 			std::string password)
@@ -326,7 +329,7 @@ namespace felidae
 			
 			// allocate new mosquitto instance
 			if (status == ERC::SUCCESS)
-				m_pMosq = mosquitto_new(client_id.c_str(), is_clean, nullptr);
+				m_pMosq = mosquitto_new(client_name.c_str(), is_clean, nullptr);
 			
 			// check allocation status
 			if (m_pMosq == nullptr)
@@ -344,12 +347,12 @@ namespace felidae
 			if (status == ERC::SUCCESS)
 			{
 				//mosquitto_threaded_set(m_pMosq, this);
-				mosquitto_message_callback_set(m_pMosq, s_on_message_wrapper);
-				mosquitto_publish_callback_set(m_pMosq, s_on_publish_wrapper);
-				mosquitto_connect_callback_set(m_pMosq, s_on_connect_wrapper);
-				mosquitto_disconnect_callback_set(m_pMosq, s_on_disconnect_wrapper);
-				mosquitto_subscribe_callback_set(m_pMosq, s_on_subscribe_wrapper);
-				mosquitto_unsubscribe_callback_set(m_pMosq, s_on_unsubscribe_wrapper);
+				mosquitto_message_callback_set(m_pMosq, si_on_message_wrapper);
+				mosquitto_publish_callback_set(m_pMosq, si_on_publish_wrapper);
+				mosquitto_connect_callback_set(m_pMosq, si_on_connect_wrapper);
+				mosquitto_disconnect_callback_set(m_pMosq, si_on_disconnect_wrapper);
+				mosquitto_subscribe_callback_set(m_pMosq, si_on_subscribe_wrapper);
+				mosquitto_unsubscribe_callback_set(m_pMosq, si_on_unsubscribe_wrapper);
 			}
 
 			// update initialization flag
@@ -399,7 +402,7 @@ namespace felidae
 			//return status;
 		}
 
-		ERC Client::start_network_monitor(void)
+		ERC Client::i_start_network_monitor(void)
 		{
 			ERC status = ERC::SUCCESS;
 
@@ -413,7 +416,7 @@ namespace felidae
 					
 					std::this_thread::sleep_for(std::chrono::milliseconds(500));		// Wait to start up
 					
-					// BUG : If thread is joinable, it means it is not running. Hence, failure.
+					// BUG: If thread is joinable, it means it is not running. Hence, failure.
 					// status = (m_monitor_thread.joinable()) ? ERC::FAILURE : ERC::SUCCESS;
 				#else
 					status = (ERC)mosquitto_loop_start(m_pMosq);
@@ -432,7 +435,7 @@ namespace felidae
 			return status;
 		}
 
-		ERC Client::stop_network_monitor(void)
+		ERC Client::i_stop_network_monitor(void)
 		{
 			ERC status = ERC::SUCCESS;
 
@@ -529,49 +532,49 @@ namespace felidae
 		// STATIC DEFINITIONS
 		// ------------------------------------------------------
 
-		void Client::s_service_wrapper(void* instance)
+		void Client::si_service_wrapper(void* instance)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_actual_job();						// This thread blocks here
 		}
 
-		void Client::s_network_monitor_wrapper(void* instance)
+		void Client::si_network_monitor_wrapper(void* instance)
 		{
 			auto self_ref = static_cast<Client*>(instance);
 			self_ref->i_actual_monitor();						// This thread blocks here
 		}
 
-		void Client::s_on_connect_wrapper(mosquitto* instance, void* obj, int status)
+		void Client::si_on_connect_wrapper(mosquitto* instance, void* obj, int status)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_connect_callback(instance, status);
 		}
 
-		void Client::s_on_disconnect_wrapper(mosquitto* instance, void* obj, int status)
+		void Client::si_on_disconnect_wrapper(mosquitto* instance, void* obj, int status)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_disconnect_callback(instance, status);
 		}
 
-		void Client::s_on_subscribe_wrapper(mosquitto* instance, void* obj, int mid, int qos, const int* granted_qos)
+		void Client::si_on_subscribe_wrapper(mosquitto* instance, void* obj, int mid, int qos, const int* granted_qos)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_subscribe_callback(instance, mid, qos, granted_qos);
 		}
 
-		void Client::s_on_unsubscribe_wrapper(mosquitto* instance, void* obj, int mid)
+		void Client::si_on_unsubscribe_wrapper(mosquitto* instance, void* obj, int mid)
 		{
 			Client* self_instance = (Client*)instance;
 			self_instance->i_on_unsubscribe_callback(instance, mid);
 		}
 
-		void Client::s_on_publish_wrapper(mosquitto* instance, void* obj, int mid)
+		void Client::si_on_publish_wrapper(mosquitto* instance, void* obj, int mid)
 		{
 			auto self_ref = static_cast<Client*>(obj);
 			self_ref->i_on_publish_callback(instance, mid);
 		}
 
-		void Client::s_on_message_wrapper(mosquitto* instance, void* obj, const mosquitto_message* msg)
+		void Client::si_on_message_wrapper(mosquitto* instance, void* obj, const mosquitto_message* msg)
 		{
 			auto self_ref = std::make_unique<Client>();
 			self_ref->i_on_message_callback(msg);

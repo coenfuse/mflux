@@ -73,8 +73,8 @@ void setupSignalHandlers()
 }
 
 
-// TODO : Args class and parser
-// TODO : Logging setup
+// TODO - Args class and parser
+// TODO - Logging setup
 
 
 // The entry point of the program
