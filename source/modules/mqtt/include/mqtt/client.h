@@ -229,19 +229,19 @@ namespace felidae
 			// on_connect callback. This callback will be executed whenever
 			// the client connects or reconnects to the broker.
 			static void si_on_connect_wrapper(mosquitto* p_mosq, void* p_obj, int status);
-			void i_on_connect_callback(void* instance, int status);
+			void i_on_connect_callback(void* p_instance, int status);
 
 			// A static on disconnect wrapper (thread support) and an actual
 			// on_disconnect callback. This callback will be executed whenever
 			// the client disconnects from the broker.
 			static void si_on_disconnect_wrapper(mosquitto* p_mosq, void* p_obj, int status);
-			void i_on_disconnect_callback(void* instance, int status);
+			void i_on_disconnect_callback(void* p_instance, int status);
 
 			// A static on subscribe wrapper (thread support) and an actual
 			// on_subscribe callback. This callback will be executed whenever
 			// the client makes a successful subscription on the broker.
-			static void si_on_subscribe_wrapper(mosquitto* p_mosq, void* p_obj, int mid, int qos, const int* p_granted_qos);
-			void i_on_subscribe_callback(void* p_instance, int mid, int qos, const int* granted_qos);
+			static void si_on_subscribe_wrapper(mosquitto* p_mosq, void* p_obj, int mid, int qos_count, const int* p_granted_qos);
+			void i_on_subscribe_callback(void* p_instance, int mid, int qos_count, const int* granted_qos);
 
 			// A static on unsubscribe wrapper (thread support) and an actual
 			// on_unsubscribe callback. This callback will be executed whenever
