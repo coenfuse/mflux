@@ -31,8 +31,6 @@ namespace felidae
             ~Subscription(){}
 
             /// Get the topic name of the subscription object
-            ///
-            /// return topic string
             inline std::string get_topic(void) const;
 
             /// Set a topic name for this subscription object.

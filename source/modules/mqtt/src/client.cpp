@@ -26,8 +26,10 @@ namespace felidae
 {
 	namespace mqtt
 	{
-		// Static / Global attributes declaration
-		// TODO - Docs, it is a patch work
+		// PATCH - globally available variable that stores on_message callbacks
+		// Its a map object with a string key (topic name) and a callback value.
+		// The client fails to function as required when this variable is set
+		// as an attribute to client. Tested in both static and non-static style.
 		std::map<std::string, Client::msg_callback_t> g_on_msg_callback_table = {};
 
 		Client::Client(void):
@@ -60,7 +62,7 @@ namespace felidae
 			if(!m_is_mosq_initialized)
 				status = this->i_initialize(client_name, is_clean, username, password);
 
-			// connect async to mqtt
+			// connect asynchronously to mqtt
 			if (status == ERC::SUCCESS)
 			{
 				if(!m_is_mosq_connected)
@@ -474,8 +476,7 @@ namespace felidae
 
 		void Client::i_on_disconnect_callback(void* instance, int status)
 		{
-			// TODO : Find a way to detect if disconnection was manual or
-			// due to an error. Try reconnecting if the latter is true.
+			// TODO - Find a way to detect if disconnection was manual or due to an error. Try reconnecting if the latter is true.
 			spdlog::debug("{} mosquitto disconnected", SELF_NAME);
 		}
 
