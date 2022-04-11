@@ -56,7 +56,8 @@ namespace felidae
 			std::string password, 
 			int timeout_s)
 		{
-			auto status = ERC::SUCCESS;
+			auto status  = ERC::SUCCESS;
+			int mosq_erc = MOSQ_ERR_SUCCESS;
 
 			// initialize mosquitto library
 			if(!m_is_mosq_initialized)
@@ -66,17 +67,20 @@ namespace felidae
 			if (status == ERC::SUCCESS)
 			{
 				if(!m_is_mosq_connected)
-					status = (ERC)(mosquitto_connect_async(m_pMosq, host.c_str(), port, timeout_s));
+					mosq_erc = mosquitto_connect_async(m_pMosq, host.c_str(), port, timeout_s);
 
-				if(status == ERC::SUCCESS)
-					status = (ERC)(mosquitto_reconnect_async(m_pMosq));
-			}
+				if(mosq_erc == MOSQ_ERR_SUCCESS)
+					mosq_erc = mosquitto_reconnect_async(m_pMosq);
+
+				if(mosq_erc != MOSQ_ERR_SUCCESS)
+					status = ERC::FAILURE;
+			}	
 
 			// start mosquitto network monitor
 			if(status == ERC::SUCCESS)
 				status = i_start_network_monitor();
 
-			// The network monitor should ideally be started post-init and pre-connect,
+			// NOTE - The network monitor should ideally be started post-init and pre-connect,
 			// but doing so causes a little delay in callbacks invocations. Starting
 			// monitor post connection resolves the issue surprisingly.
 
@@ -468,10 +472,10 @@ namespace felidae
 
 		void Client::i_on_connect_callback(void* instance, int status)
 		{
-			//if(custom_callback != nullptr)
-			//	custom_callback(status);
-			//else
-				spdlog::debug("{} mosquitto connected", SELF_NAME);
+			if (status == MOSQ_ERR_SUCCESS)
+				spdlog::debug("{} mosquitto connect success", SELF_NAME);
+			else
+				spdlog::error("{} mosquitto connect failure with MOSQ_ERR_CODE {}", SELF_NAME, status);
 		}
 
 		void Client::i_on_disconnect_callback(void* instance, int status)
