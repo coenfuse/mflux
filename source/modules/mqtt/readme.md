@@ -5,7 +5,8 @@
 * The MQTT module provides all the necessary tools and services to Mflux for working with MQTT network.
 * It provides the following classes to work with :
     * **Client** : Provides a consistent interface for usage of the [mosquitto]() library that communicates with MQTT network. It also provides an additional functionality of `start_service()` and `stop_service()` functions that are tailor made for mflux handling the pushing and publising of incoming and outgoing mqtt messages into and from mflux buffer.
-    * **Message** : A mqtt message data structure that contains all the info for single message transmission to MQTT.
+    * **Message** : A simple data structure that contains all the info for a single message on MQTT.
+    * **Subscription** : A simple data structure that contains all the info a single subscription on MQTT
 
 ### How do I get set up? ###
 
@@ -15,4 +16,4 @@
 
 ### Dependencies ###
 
-* To communicate with InfluxDB on a remote location, this module uses the [mosquitto]() library.
+* To communicate with MQTT broker on a remote location, this module uses the [mosquitto]() library.

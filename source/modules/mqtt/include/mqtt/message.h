@@ -73,10 +73,10 @@ namespace felidae
 			/// Set the retention status of this MQTT message
 			inline void set_to_retain(bool retain_status);
 
-			// TODO : mqtt::Message::dump()
+			// TODO - define dump()
 			// inline std::string dump() const;
 			
-			// TODO : mqtt::Message::parse()
+			// TODO - define parse()
 			// static inline ERC parse(std::string msg) const;
 
 		private:
