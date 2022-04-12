@@ -20,7 +20,6 @@
 #include "spdlog/spdlog.h"
 
 
-// TODO - Repair ERC overriding for moqsuitto return codes. Do not do mosquitto codes to ERC translation. Return both codes as reponse in error messages.
 
 namespace felidae
 {
@@ -122,9 +121,9 @@ namespace felidae
 
 				// log
 				if (!m_is_mosq_initialized)
-					spdlog::debug("{} mosquitto instance destroy success", SELF_NAME);
+					spdlog::debug("{} mosq init clear success", SELF_NAME);
 				else
-					spdlog::error("{} mosquitto instance destroy failure with code {}", SELF_NAME, status);				
+					spdlog::error("{} mosq init clear failure with code {}", SELF_NAME, status);				
 			}
 
 			return status;
@@ -167,11 +166,11 @@ namespace felidae
 				if(callback != nullptr)
 				{
 					g_on_msg_callback_table[topic] = callback;
-					spdlog::debug("{} subscribe success to topic '{}' with callback", SELF_NAME, topic);
+					spdlog::debug("{} subscribe success to topic:{} qos:{} [C]", SELF_NAME, topic, qos);
 				}
 				else
 				{
-					spdlog::debug("{} subscribe success to topic '{}' w/o callback", SELF_NAME, topic);
+					spdlog::debug("{} subscribe success to topic:{} qos:{}", SELF_NAME, topic, qos);
 				}
 			}
 			else
@@ -204,7 +203,7 @@ namespace felidae
 				if (mosq_erc == MOSQ_ERR_SUCCESS)
 					g_on_msg_callback_table.erase(topic);
 				else
-					status = ERC::FAILURE;
+					status = ERC::FAILURE;					// means, unsubscription failed
 
 				// log
 				if(status == ERC::SUCCESS)
@@ -223,7 +222,7 @@ namespace felidae
 
 			if (!this->is_running())
 			{
-				spdlog::debug("{} service starting", SELF_NAME);
+				spdlog::trace("{} service starting", SELF_NAME);
 
 				// allocate config and buffer pointer copies
 				m_pConfig = p_config;
@@ -290,9 +289,9 @@ namespace felidae
 					status = ERC::SUCCESS;
 
 				if (status == ERC::SUCCESS)
-					spdlog::info("{} service started", SELF_NAME);
+					spdlog::debug("{} service start success", SELF_NAME);
 				else
-					spdlog::error("{} service failed to start with code {}", SELF_NAME, status);
+					spdlog::error("{} service start failure with code {}", SELF_NAME, status);
 			}
 
 			return status;
@@ -304,7 +303,7 @@ namespace felidae
 
 			if (this->is_running())
 			{
-				spdlog::debug("{} service stopping", SELF_NAME);
+				spdlog::trace("{} service stopping", SELF_NAME);
 
 				// stop service
 				m_signalled_stop.exchange(true);
@@ -328,7 +327,7 @@ namespace felidae
 
 				// log
 				if (status == ERC::SUCCESS)
-					spdlog::info("{} service stopped", SELF_NAME);
+					spdlog::debug("{} service stop success", SELF_NAME);
 				else
 					spdlog::error("{} service failed to stop with code {}", SELF_NAME, status);
 			}
@@ -352,7 +351,10 @@ namespace felidae
 			std::string username, 
 			std::string password)
 		{
-			auto status = ERC::SUCCESS;
+			auto status  = ERC::SUCCESS;
+			int mosq_erc = MOSQ_ERR_SUCCESS;
+
+			spdlog::trace("{} mosq initializing", SELF_NAME);
 
 			if(mosquitto_lib_init() != MOSQ_ERR_SUCCESS)
 				status = ERC::MEMORY_ALLOCATION_FAILED;
@@ -367,11 +369,11 @@ namespace felidae
 
 			// set mosquitto credentials
 			if (status == ERC::SUCCESS)
-			{
-				auto uid_cstr = username.c_str();
-				auto pwd_cstr = password.c_str();
-				status = (ERC)(mosquitto_username_pw_set(m_pMosq, uid_cstr, pwd_cstr));
-			}
+				mosq_erc = mosquitto_username_pw_set(m_pMosq, username.c_str(), password.c_str());
+
+			// update status
+			if (mosq_erc != MOSQ_ERR_SUCCESS)
+				status = ERC::FAILURE;
 
 			// set mosquitto callbacks
 			if (status == ERC::SUCCESS)
@@ -391,9 +393,9 @@ namespace felidae
 
 			// log
 			if (m_is_mosq_initialized)
-				spdlog::debug("{} mosquitto instance initialized", SELF_NAME);
+				spdlog::debug("{} mosq init success", SELF_NAME);
 			else
-				spdlog::error("{} mosquitto instance initialization failed", SELF_NAME);
+				spdlog::error("{} mosq init failure with MOSQ_ERR_CODE {}", SELF_NAME, mosq_erc);
 
 			return status;
 		}
@@ -434,11 +436,12 @@ namespace felidae
 
 		ERC Client::i_start_network_monitor(void)
 		{
-			ERC status = ERC::SUCCESS;
+			auto status  = ERC::SUCCESS;
+			int mosq_erc = MOSQ_ERR_SUCCESS;
 
 			if(!m_is_monitoring)
 			{
-				spdlog::debug("{} network monitor starting", SELF_NAME);
+				spdlog::trace("{} mosq loop starting", SELF_NAME);
 
 				#ifdef WIN32
 					m_is_monitoring.exchange(true);
@@ -449,17 +452,19 @@ namespace felidae
 					// BUG: If thread is joinable, it means it is not running. Hence, failure.
 					// status = (m_monitor_thread.joinable()) ? ERC::FAILURE : ERC::SUCCESS;
 				#else
-					status = (ERC)mosquitto_loop_start(m_pMosq);
+					mosq_erc = mosquitto_loop_start(m_pMosq);
 					std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-					if (status == ERC::SUCCESS)
+					if (mosq_erc == MOSQ_ERR_SUCCESS)
 						m_is_monitoring = true;
+					else
+						status = ERC::FAILURE;
 				#endif
 				
 				if (status == ERC::SUCCESS)
-					spdlog::debug("{} network monitor started", SELF_NAME);
+					spdlog::debug("{} mosq loop start success", SELF_NAME);
 				else
-					spdlog::error("{} network monitor startup failed", SELF_NAME);
+					spdlog::error("{} mosq loop start failure with MOSQ_ERR_CODE {}", SELF_NAME, mosq_erc);
 			}
 
 			return status;
@@ -467,22 +472,29 @@ namespace felidae
 
 		ERC Client::i_stop_network_monitor(void)
 		{
-			ERC status = ERC::SUCCESS;
+			auto status  = ERC::SUCCESS;
+			int mosq_erc = MOSQ_ERR_SUCCESS;
 
 			if(m_is_monitoring)
 			{
-				spdlog::debug("{} network monitor stopping", SELF_NAME);
+				spdlog::trace("{} mosq loop stopping", SELF_NAME);
 
 				#ifdef WIN32
 					m_is_monitoring.exchange(false);
 					m_monitor_thread.join();											// Wait to stop and join
 				#else
-					status = (ERC)mosquitto_loop_stop(m_pMosq, true);
-					if (status == ERC::SUCCESS)
+					mosq_erc = mosquitto_loop_stop(m_pMosq, true);
+					
+					if (mosq_erc == MOSQ_ERR_SUCCESS)
 						m_is_monitoring = false;
+					else
+						status = ERC::FAILURE;
 				#endif
 
-				spdlog::debug("{} network monitor stopped", SELF_NAME);
+				if (status == ERC::SUCCESS)
+					spdlog::debug("{} mosq loop stop success", SELF_NAME);
+				else
+					spdlog::error("{} mosq loop stop failure with MOSQ_ERR_CODE {}", SELF_NAME, mosq_erc);
 			}
 
 			return status;
@@ -497,28 +509,28 @@ namespace felidae
 		void Client::i_on_connect_callback(void* instance, int status)
 		{
 			if (status == MOSQ_ERR_SUCCESS)
-				spdlog::debug("{} mosquitto connect success", SELF_NAME);
+				spdlog::debug("{} mosq connect success", SELF_NAME);
 			else
-				spdlog::error("{} mosquitto connect failure with MOSQ_ERR_CODE {}", SELF_NAME, status);
+				spdlog::error("{} mosq connect failure with MOSQ_ERR_CODE {}", SELF_NAME, status);
 		}
 
 		void Client::i_on_disconnect_callback(void* instance, int status)
 		{
 			// TODO - Find a way to detect if disconnection was manual or due to an error. Try reconnecting if the latter is true.
 			if (status == MOSQ_ERR_SUCCESS)
-				spdlog::debug("{} mosquitto disconnect success", SELF_NAME);
+				spdlog::debug("{} mosq disconnect success", SELF_NAME);
 			else
-				spdlog::error("{} mosquitto disconnect failure with MOSQ_ERR_CODE {}", SELF_NAME, status);
+				spdlog::error("{} mosq disconnect failure with MOSQ_ERR_CODE {}", SELF_NAME, status);
 		}
 
 		void Client::i_on_subscribe_callback(void* instance, int mid, int qos_count, const int* granted_qos)
 		{
-			spdlog::debug("{} mosquitto subscribed with mid {} and qos {}", SELF_NAME, mid, *granted_qos);
+			spdlog::debug("{} mosq subs with mid {} and qos {}", SELF_NAME, mid, *granted_qos);
 		}
 
 		void Client::i_on_unsubscribe_callback(void* instance, int mid)
 		{
-			spdlog::debug("{} mosquitto unsubscribed with mid {}", SELF_NAME, mid);
+			spdlog::debug("{} mosq unsub with mid {}", SELF_NAME, mid);
 		}
 
 		void Client::i_on_publish_callback(void* instance, int mid)
@@ -526,7 +538,7 @@ namespace felidae
 			//if(custom_callback != nullptr)
 			//	custom_callback(status);
 			//else
-			spdlog::debug("{} mosquitto published a message", SELF_NAME);
+			spdlog::debug("{} mosq sent msg with mid {}", SELF_NAME, mid);
 		}
 
 		void Client::i_on_message_callback(const mosquitto_message* msg)
@@ -534,7 +546,7 @@ namespace felidae
 			// cache topic into a strig type
 			auto topic = std::string(msg->topic);
 
-			spdlog::debug("{} received a message from topic {}", SELF_NAME, topic);
+			spdlog::debug("{} mosq recv msg with topic {}", SELF_NAME, topic);
 
 			// search callback table for any callback actions
 			if (g_on_msg_callback_table.find(topic) != g_on_msg_callback_table.end())
