@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}/out/build/source/apps/mflux/mflux-main",
             "args": [
                 "--config",
-                "${workspaceFolder}/source/.config/mflux.config.jsonc",
+                "${workspaceFolder}/config/mflux_local.config.jsonc",
                 "--stdout",
                 "-v"
             ],
