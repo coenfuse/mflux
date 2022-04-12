@@ -15,7 +15,7 @@
     // -----------------------------------
     // Config Description
     // Config example
-    "log_dir": "../../out/logs",
+    "log_dir": "out/logs",
 
     // Config Name
     // -----------------------------------

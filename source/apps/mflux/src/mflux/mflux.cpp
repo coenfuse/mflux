@@ -88,7 +88,7 @@ namespace felidae
 
         parser.add_option("--config", config_file, "JSON file containing mflux configurations")->required()->option_text("<filename>");
         parser.add_flag("--stdout", m_is_logging_to_std, "Whether to display the log on console");
-        parser.add_flag("-v", m_is_verbose, "Increase verbosity of log 'if' being displayed");
+        parser.add_flag("-v", m_is_verbose, "Increase verbosity of console log, if enabled");
 
         try
         {

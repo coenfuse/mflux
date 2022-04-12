@@ -69,12 +69,12 @@ void setupSignalHandlers()
 
 
 	// Ctrl-Break sequence
-	signal(SIGBREAK, [](int signal) {});
+	// signal(SIGBREAK, [](int signal) {});
 }
 
 
-// TODO : Args class and parser
-// TODO : Logging setup
+// TODO - Args class and parser
+// TODO - Logging setup
 
 
 // The entry point of the program
