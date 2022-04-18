@@ -13,6 +13,7 @@
 
 // thirdparty includes
 // #include "cinflux/cinflux.h"
+#include "fmt/format.h"
 #include "httplib/httplib.h"
 #include "spdlog/spdlog.h"
 
@@ -49,6 +50,9 @@ namespace felidae
 
 			if(httpres != 204)
 				status = ERC::FAILURE;
+				
+			if(status == ERC::SUCCESS)
+				m_pHTTP_cli->set_keep_alive(true);
 
 			if (status == ERC::SUCCESS)
 				spdlog::info("{} remote connect success at {}:{}", SELF_NAME, host, port);
@@ -62,6 +66,7 @@ namespace felidae
 		{
 			auto status = ERC::SUCCESS;
 
+			// m_pHTTP_cli->set_keep_alive(false);
 			// m_pHTTP_cli.reset();		// After stopping the thread
 
 			return status;
@@ -81,7 +86,7 @@ namespace felidae
 		}
 
 
-		ERC Client::get(void)
+		ERC Client::query(std::string org_name, std::string bucket, std::string flux_query)
 		{
 			auto status = ERC::SUCCESS;
 			
@@ -90,29 +95,27 @@ namespace felidae
 			return status;
 		}
 
-		ERC Client::push(void)
+		ERC Client::write(std::string org, std::string bucket, Message data)
 		{
-			auto status = ERC::SUCCESS;
+			auto status = ERC::FAILURE;
 
-			// ..
+			if(this->is_connected())
+			{
+				auto path = fmt::format("/api/v2/write?org={}&bucket={}&precision=us", org, bucket);
 
-			return status;
-		}
+				httplib::Headers headers = {
+					{"Authorization", fmt::format("Token {}", m_token)},
+					{"Content-Type", "text/plain; charset=utf-8"},
+					{"Accept", "application/json"}
+				};
 
-		ERC Client::pop(void)
-		{
-			auto status = ERC::SUCCESS;
+				auto res = m_pHTTP_cli->Post(path.c_str(), headers, data.dump().c_str(), data.dump().length(), "text/plain");
 
-			// ..
-
-			return status;
-		}
-
-		ERC Client::remove(void)
-		{
-			auto status = ERC::SUCCESS;
-
-			// ..
+				if(res->status == 204)
+					spdlog::info("{} write success", SELF_NAME);
+				else
+					spdlog::warn("{} write failure with HTTP code {} and res {} for data {}", SELF_NAME, res->status, res->body, data.dump());
+			}
 
 			return status;
 		}
@@ -204,8 +207,11 @@ namespace felidae
 					spdlog::trace("Received {}", influx_msg.dump());
 
 					// Send it to Influx DB
-					// if (status == ERC::SUCCESS)
-					// 	status = this->push(influx_msg);
+					if (status == ERC::SUCCESS)
+						status = this->write(
+							m_pConfig->get_influx_org_name(),
+							m_pConfig->get_influx_db_name(),
+							influx_msg);
 				}
 
 				// Take a breath for while

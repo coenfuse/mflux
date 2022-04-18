@@ -9,7 +9,7 @@
 
 
 // internal includes
-// ..
+#include "message.h"
 
 
 // module includes
@@ -60,16 +60,10 @@ namespace felidae
 
 			
 			// TODO : Docs
-			ERC get(void);
+			ERC query(std::string org_name, std::string bucket, std::string flux_query);
 			
 			// TODO : Docs
-			ERC push(void);
-			
-			// TODO : Docs
-			ERC pop(void);
-			
-			// TODO : Docs
-			ERC remove(void);
+			ERC write(std::string org_nam, std::string bucket, Message data);
 
 			
 			// TODO : Docs
