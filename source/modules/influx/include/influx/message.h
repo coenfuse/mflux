@@ -311,9 +311,6 @@ namespace felidae
 
 		std::string Message::dump(void) const
 		{
-			// Current : BASSAI,payload=touchme qos=0,retention=0,1650293894380114
-			// Target  : BASSAI,payload=touchme qos=0,retention=0 1650293894380114
-
 			std::string dump;
 
 			// Adding measure
