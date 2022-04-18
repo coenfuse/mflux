@@ -19,7 +19,8 @@
 
 
 // thirdparty includes
-// ..
+#include "httplib/httplib.h"
+// #include "cinflux/cinflux.h"
 
 
 // forward references
@@ -49,7 +50,7 @@ namespace felidae
 			~Client(void);
 
 			// TODO : Docs
-			ERC connect(void);
+			ERC connect(std::string host, uint16_t port, std::string token);
 			
 			// TODO : Docs
 			ERC disconnect(void);
@@ -92,11 +93,17 @@ namespace felidae
 			
 			static constexpr const char* SELF_NAME = "INFLUX";
 
-			std::atomic_bool m_signalled_stop = true;
+			std::atomic<bool> m_signalled_stop;
 			std::thread m_worker;
 
 			std::shared_ptr<Configurator> m_pConfig;
 			std::shared_ptr<MemDB> m_pBuffer;
+
+			// TODO : remove cinflux params
+			std::shared_ptr<httplib::Client> m_pHTTP_cli;
+			std::string m_host;
+			uint16_t m_port;
+			std::string m_token;
 		};
 	}
 }

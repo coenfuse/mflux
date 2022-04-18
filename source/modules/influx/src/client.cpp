@@ -12,7 +12,8 @@
 
 
 // thirdparty includes
-// cinflux
+// #include "cinflux/cinflux.h"
+#include "httplib/httplib.h"
 #include "spdlog/spdlog.h"
 
 
@@ -21,18 +22,38 @@ namespace felidae
 	namespace influx
 	{
 		
-		Client::Client(void)
+		Client::Client(void):
+			m_pBuffer(nullptr),
+			m_pConfig(nullptr),
+			m_signalled_stop(true),
+			m_pHTTP_cli(nullptr)
 		{}
 
 		Client::~Client(void)
 		{}
 
 
-		ERC Client::connect(void)
+		ERC Client::connect(std::string host, uint16_t port, std::string token)
 		{
 			auto status = ERC::SUCCESS;
+			int httpres = 0;
 
-			// ..
+			m_pHTTP_cli = std::make_shared<httplib::Client>(host, port);
+			m_token = token;
+
+			if (m_pHTTP_cli == nullptr)
+				status = ERC::MEMORY_ALLOCATION_FAILED;
+
+			if (status == ERC::SUCCESS)
+				httpres = m_pHTTP_cli->Get("/ping")->status;
+
+			if(httpres != 204)
+				status = ERC::FAILURE;
+
+			if (status == ERC::SUCCESS)
+				spdlog::info("{} remote connect success at {}:{}", SELF_NAME, host, port);
+			else
+				spdlog::error("{} remote connect failure at {}:{} with HTTP code {}", SELF_NAME, host, port, httpres);
 
 			return status;
 		}
@@ -41,16 +62,20 @@ namespace felidae
 		{
 			auto status = ERC::SUCCESS;
 
-			// ..
+			// m_pHTTP_cli.reset();		// After stopping the thread
 
 			return status;
 		}
 
 		bool Client::is_connected(void)
 		{
-			auto status = true;
+			auto status = false;
 
-			// ..
+			if (m_pHTTP_cli != nullptr)
+			{
+				if(m_pHTTP_cli->Get("/ping")->status == 204)
+					status = true;
+			}
 
 			return status;
 		}
@@ -106,6 +131,12 @@ namespace felidae
 
 				if ((m_pConfig == nullptr) || (m_pBuffer == nullptr))
 					status = ERC::NULLPTR_RECV;
+
+				if(status == ERC::SUCCESS)
+					status = this->connect(
+						m_pConfig->get_influx_host(), 
+						m_pConfig->get_influx_port(), 
+						m_pConfig->get_influx_db_auth_key());
 
 				if (status == ERC::SUCCESS)
 					m_worker = std::thread(s_service_wrapper, this);
