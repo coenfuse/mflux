@@ -2,9 +2,22 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "Build",
             "type": "shell",
-            "command": "cd ${workspaceFolder}/out/build/ && cmake -DCMAKE_BUILD_TYPE=Debug ../../ && cmake --build ."
+            "command": "cd ${workspaceFolder}/out/build/ && cmake -DCMAKE_BUILD_TYPE=Debug ../../ && cmake --build .",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Rebuild",
+            "type": "shell",
+            "command": "cd ${workspaceFolder}/out/build/ && rm -rf * && touch make && cmake -DCMAKE_BUILD_TYPE=Debug ../../ && cmake --build .",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
         }
     ]
 }

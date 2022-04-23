@@ -34,6 +34,7 @@ namespace felidae
             into_this.add_tag_set("payload", this_msg.get_payload());
             into_this.add_field_set("retention", this_msg.get_to_retain());
             into_this.add_field_set("qos", (int64_t)this_msg.get_qos());
+            into_this.set_timestamp_precision(influx::Message::TimeStamp_t::microseconds);
             
             return status;
         }

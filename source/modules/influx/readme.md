@@ -15,4 +15,4 @@
 
 ### Dependencies ###
 
-* To communicate with InfluxDB on a remote location, this module uses the [cinflux]() library.
+* To communicate with InfluxDB on a remote location, this module uses the [httplib]() library.

@@ -41,7 +41,7 @@ namespace felidae
 		/// Measure   : The name of the measurement, here it is 'cpu_z'
 		/// Tag Set   : The tags of the measurement, here they are 'sub_id' and 'user_id'
 		/// Field Set : The fields of the measurement, here they are 'celsius', 'cost' and 'precipitation'
-		/// Timestamp : The timestamp when the measurement is made in microseconds since epoch.
+		/// Timestamp : The timestamp when the measurement is made in microseconds (default) since epoch.
 		///
 		/// * Tag name and tag values are always a string
 		/// * Field name is always a string but field value can be
@@ -49,18 +49,32 @@ namespace felidae
 		/// * Whenever an object of this data structure is made, it
 		///   assigns itself a timestamp in microseconds since epoch
 		///   However this can be overwritten using set_timestamp()
+		///   and set_timestamp_precision()
 	
 		class Message
 		{
 			// These are the data types permitted in influx payload
 			// as a field value
 			using value_t = std::variant<bool, int64_t, double, std::string>;
+
+		public:
+
+			// This publicly available data-type denotes the timestamp
+			// precision type for Influx Message.
+			enum class TimeStamp_t : uint16_t
+			{
+				nanoseconds = 0,
+				microseconds,
+				milliseconds,
+				seconds
+			};
 		
 		public:
 
 			Message(void)
 			{
 				m_timestamp = std::to_string(std::chrono::system_clock::now().time_since_epoch() / std::chrono::microseconds(1));
+				m_timestamp_precision = TimeStamp_t::microseconds;
 			}
 
 			~Message(void){}
@@ -75,10 +89,10 @@ namespace felidae
 			inline std::string get_tag_value(std::string tag_key) const;
 
 			/// Set a tag value for an existing tag in this measurment
-			inline ERC set_tag_value(std::string tag_key, std::string tag_value);
+			inline ERC set_tag_value(std::string tag_key, std::string tag_val);
 
 			/// Add a new tag to this measurement
-			inline ERC add_tag_set(std::string tag_key, std::string tag_value);
+			inline ERC add_tag_set(std::string tag_key, std::string tag_val);
 
 			/// Remove an existing tag from this measurement
 			inline ERC remove_tag_set(std::string tag_key);
@@ -87,10 +101,10 @@ namespace felidae
 			inline std::string get_field_value(std::string field_key) const;
 
 			/// Set a field value for an existing field in this measurment
-			inline ERC set_field_value(std::string field_key, value_t field_value);
+			inline ERC set_field_value(std::string field_key, value_t field_val);
 
 			/// Add a new field to this measurement
-			inline ERC add_field_set(std::string field_key, value_t field_value);
+			inline ERC add_field_set(std::string field_key, value_t field_val);
 
 			/// Remove an existing field from this measurement
 			inline ERC remove_field_set(std::string field_key);
@@ -101,10 +115,16 @@ namespace felidae
 			/// Update the timestamp of this measurement
 			inline ERC set_timestamp(std::string timestamp);
 
+			/// Get the timestamp precision of this measurement
+			inline std::string get_timestamp_precision(void) const;
+
+			/// Set the timestamp precision of this measurement
+			inline ERC set_timestamp_precision(TimeStamp_t timestamp_precision);
+
 			/// Serialize this measurement
 			inline std::string dump(void) const;
 
-			// TODO : influx::Message::parse()
+			// TODO - define parse()
 			// static inline ERC parse(std::string msg) const;
 
 			/// Clear all existing measurements
@@ -116,6 +136,7 @@ namespace felidae
 			std::map<std::string, std::string> m_tags;
 			std::map<std::string, value_t> m_fields;
 			std::string m_timestamp;
+			TimeStamp_t m_timestamp_precision;
 		};
 
 
@@ -309,6 +330,36 @@ namespace felidae
 
 
 
+		std::string Message::get_timestamp_precision(void) const
+		{
+			switch(m_timestamp_precision)
+			{
+				case TimeStamp_t::nanoseconds : return "ns";
+				break;
+				
+				case TimeStamp_t::microseconds : return "us";
+				break;
+
+				case TimeStamp_t::milliseconds : return "ms";
+				break;
+
+				case TimeStamp_t::seconds : return "s";
+				break;
+
+				default : return "null";
+			}
+		}
+
+
+
+		ERC Message::set_timestamp_precision(Message::TimeStamp_t timestamp_prec)
+		{
+			m_timestamp_precision = timestamp_prec;
+			return ERC::SUCCESS;
+		}
+
+
+
 		std::string Message::dump(void) const
 		{
 			std::string dump;
@@ -338,7 +389,7 @@ namespace felidae
 			dump.pop_back();
 
 			// Adding timestamp
-			dump += fmt::format(",{}", m_timestamp);
+			dump += fmt::format(" {}", m_timestamp);
 
 			return dump;
 		}
@@ -360,6 +411,7 @@ namespace felidae
 			m_tags.clear();
 			m_fields.clear();
 			m_timestamp = std::to_string(std::chrono::system_clock::now().time_since_epoch() / std::chrono::microseconds(1));
+			m_timestamp_precision = TimeStamp_t::microseconds;
 		}
 	}
 }
