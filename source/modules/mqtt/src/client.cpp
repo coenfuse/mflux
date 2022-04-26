@@ -2,7 +2,6 @@
 #include <memory>
 
 
-
 // internal includes
 #include "mqtt/client.h"
 #include "mqtt/message.h"

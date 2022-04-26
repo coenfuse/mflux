@@ -9,11 +9,9 @@
 #include <thread>
 
 
-
 // internal includes
 #include "message.h"
 #include "subscription.h"
-
 
 
 // module includes

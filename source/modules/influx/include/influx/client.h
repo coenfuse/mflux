@@ -9,7 +9,7 @@
 
 
 // internal includes
-// ..
+#include "message.h"
 
 
 // module includes
@@ -19,7 +19,8 @@
 
 
 // thirdparty includes
-// ..
+#include "httplib/httplib.h"
+// #include "cinflux/cinflux.h"
 
 
 // forward references
@@ -49,7 +50,7 @@ namespace felidae
 			~Client(void);
 
 			// TODO : Docs
-			ERC connect(void);
+			ERC connect(std::string host, uint16_t port, std::string token);
 			
 			// TODO : Docs
 			ERC disconnect(void);
@@ -59,16 +60,10 @@ namespace felidae
 
 			
 			// TODO : Docs
-			ERC get(void);
+			ERC query(std::string org_name, std::string bucket, std::string flux_query);
 			
 			// TODO : Docs
-			ERC push(void);
-			
-			// TODO : Docs
-			ERC pop(void);
-			
-			// TODO : Docs
-			ERC remove(void);
+			ERC write(std::string org_nam, std::string bucket, Message data);
 
 			
 			// TODO : Docs
@@ -92,11 +87,17 @@ namespace felidae
 			
 			static constexpr const char* SELF_NAME = "INFLUX";
 
-			std::atomic_bool m_signalled_stop = true;
+			std::atomic<bool> m_signalled_stop;
 			std::thread m_worker;
 
 			std::shared_ptr<Configurator> m_pConfig;
 			std::shared_ptr<MemDB> m_pBuffer;
+
+			// TODO : remove cinflux params
+			std::shared_ptr<httplib::Client> m_pHTTP_cli;
+			std::string m_host;
+			uint16_t m_port;
+			std::string m_token;
 		};
 	}
 }

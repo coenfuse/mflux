@@ -338,7 +338,7 @@ namespace felidae
 			dump.pop_back();
 
 			// Adding timestamp
-			dump += fmt::format(",{}", m_timestamp);
+			dump += fmt::format(" {}", m_timestamp);
 
 			return dump;
 		}
