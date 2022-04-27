@@ -56,7 +56,14 @@ namespace felidae
     {
         ERC status = ERC::SUCCESS;
 
-        // ..
+        if(m_task == nullptr)
+            status = ERC::NULLPTR_RECV;
+
+        if(status == ERC::SUCCESS)
+            m_worker = std::thread(si_task_wrapper, this);
+
+        if(!this->is_running())
+            status = ERC::FAILURE;
 
         return status;
     }
@@ -74,7 +81,30 @@ namespace felidae
 
     bool Service::is_running(void) const
     {
-        return !m_service_thread.joinable();
+        return !m_worker.joinable();
+        // TODO - Use future and async 
+        // https://stackoverflow.com/questions/9094422/how-to-check-if-a-stdthread-is-still-running
+    }
+
+
+
+    // ------------------------------------------------------------------------
+    // 
+    // ------------------------------------------------------------------------
+
+    void Service::si_task_wrapper(void* p_instance)
+    {
+        // This thread blocks here
+        static_cast<Service*>(p_instance)->i_job();
+    }
+
+
+    void Service::i_job(void)
+    {
+        m_signalled_stop.exchange(false);
+
+        while(!m_signalled_stop)
+            m_task();
     }
 
 }   // namespace felidae

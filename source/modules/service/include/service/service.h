@@ -72,7 +72,7 @@ namespace felidae
 
         private:
 
-        std::thread m_service_thread;
+        std::thread m_worker;
         std::atomic<bool> m_signalled_stop;
         Task_t m_task;
     
