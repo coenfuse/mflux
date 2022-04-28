@@ -2,7 +2,7 @@
 
 # Adding directories that contain source files
 set(PROJECT_HDRS "include/minix/minix.h")
-set(PROJECT_SRCS "src/minix.cpp")
+set(PROJECT_SRCS "src/minix.cpp" "src/conv/converters.h" "src/conv/converters.cpp")
 
 # Setting up target
 project("minix" VERSION 0.3.0)
