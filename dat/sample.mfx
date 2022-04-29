@@ -1,0 +1,50 @@
+# I WAS BRAINSTORMING THIS FOR QUITE A WHILE. LET ME KNOW IF THIS MAKES SENSE.
+# INSPIRED BY .DBC FILE FORMAT 
+
+# This file provides conversion guidlines to minix module for converting mqtt
+# payloads to influx measurements. It requires the mqtt payload to be a JSON.
+
+BASSAI_2_bassai
+> T_IMEI            IMEI            0:0     STR STR
+> T_Region_Code     REGION{CODE}    0:0     DEC NUM
+> T_Channel_Name    DATA[0][0][0]   0:0     HEX STR
+> T_Channel_Code    DATA[0][0][1]   0:0     BIN NUM
+> F_Temprature_C    DATA[0][0][4]   6:4     HEX NUM
+> F_Pressure        DATA[0][0][4]   16:8    HEX NUM
+> F_Wattage         DATA[0][0][4]   32:8    HEX NUM
+> F_Active          DATA[0][0][4]   60:4    HEX BOO
+
+# The specified config can be deduced as follows:
+#
+# - 'BASSAI' is the MQTT payload's topic and 'bassai' is the name that'll given 
+#   to the calculated influx measurement.
+#
+# - Anything that starts with '>' are the measurement values. They'll be added 
+#   to the most recent measurment declaration above it. Here, BASSAI_2_bassai.
+#
+# - The measurement values can be either a tag-set or a field-set. The prefix
+#   'T_' or 'F_' specifies whether a measurement value is a tag_value or a
+#   field_value. Anything followed by the prefix is a tag/field name. The name
+#   shouldn't contain any white-spaces and shouldn't start with a '_'
+#
+# - The second column specifies the JSON key that contains the data that needs
+#   to be converted. If a key has a simple value, specifiying the key is enough.
+#   If a key has a object or an array as it's value. Then it can be accessed via
+#   the square '[]' or curly '{}' brackets. Conveniently, a curly bracket is for
+#   a nested object whereas square bracket is for array index or nested array
+#   index. Mix of these brackets to represent complex logic is also permissable
+#   for eg: REGION{ZONE[4]} represents 4th object value from the ZONE key of the
+#   REGION object.
+#
+# - Values specified with a colon in between just represent the number of bytes
+#   to take into consideration. 0:0 means taking full value in consideration.
+#   Whereas the rest means, start_from_index:upto_bits
+#
+# - The two flags in the end specify the data_type of value that is written in
+#   JSON and the data_type of value we need to convert it into.
+
+
+{MQTT_TOPIC}_2_{INFLUX_MEASUREMENT}
+> T_{TAG_NAME}      JSON_KEY        start_index:upto    DATA_TYPE CONV_TYPE
+> T_{TAG_NAME}      JSON_KEY{}      start_index:upto    DATA_TYPE CONV_TYPE
+> F_{FIELD_NAME}    JSON_KEY[]..    start_index:upto    DATA_TYPE CONV_TYPE
