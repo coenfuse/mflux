@@ -135,7 +135,7 @@ namespace felidae
 				else
 				{
 					spdlog::warn(
-						"{} write failure with HTTP code {} : {} for data {}",
+						"{} write failure with HTTP code {}:{} for data {}",
 						SELF_NAME, 
 						res->status, 
 						res->body,

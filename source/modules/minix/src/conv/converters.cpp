@@ -74,18 +74,18 @@ namespace felidae
             if(channel_num == 1)
             {
                 into_this.set_measure("Measurement");
-                into_this.add_tag_set("Channel", channel_name);
-                into_this.add_tag_set("Channel_Number", channel_str);
-                into_this.add_field_set("FF_CProd1", temp1_num);
+                //into_this.add_tag_set("Channel", channel_name);
+                //into_this.add_tag_set("Channel_Number", channel_str);
+                into_this.add_field_set("CProd1", temp1_num);
                 into_this.add_field_set("CProd2", temp2_num);
                 into_this.add_field_set("CLoad", watt_int);
             }
             else if(channel_num == 2)
             {
                 into_this.set_measure("Measurement");
-                into_this.add_tag_set("Channel", channel_name);
-                into_this.add_tag_set("Channel_Number", channel_str);
-                into_this.add_field_set("FF2_Temprature", temp1_num);
+                //into_this.add_tag_set("Channel", channel_name);
+                //into_this.add_tag_set("Channel_Number", channel_str);
+                into_this.add_field_set("Temprature", temp1_num);
             }
         }
         catch(std::exception& e)
