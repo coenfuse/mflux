@@ -72,8 +72,8 @@ namespace felidae
             if(channel_num == 1)
             {
                 influx_msg.set_measure("Measurement");
-                //influx_msg.add_tag_set("Channel", channel_name);
-                //influx_msg.add_tag_set("Channel_Code", channel_code);
+                influx_msg.add_tag_set("Channel", channel_name);
+                influx_msg.add_tag_set("Channel_Code", channel_code);
                 influx_msg.add_field_set("CProd1", temp1);
                 influx_msg.add_field_set("CProd2", temp2);
                 influx_msg.add_field_set("CLoad", watt);
@@ -81,8 +81,8 @@ namespace felidae
             else if(channel_num == 2)
             {
                 influx_msg.set_measure("Measurement");
-                //influx_msg.add_tag_set("Channel", channel_name);
-                //influx_msg.add_tag_set("Channel_Code", channel_code);
+                influx_msg.add_tag_set("Channel", channel_name);
+                influx_msg.add_tag_set("Channel_Code", channel_code);
                 influx_msg.add_field_set("Temprature", temp1);
             }
             else
@@ -93,7 +93,7 @@ namespace felidae
             spdlog::error(
                 "MINIX : Exception '{}' in M2I conv. for payload '{}'",
                 e.what(), 
-                this_msg.get_payload());
+                mqtt_msg.get_payload());
                 
             status = ERC::EXCEPTION;
         }
