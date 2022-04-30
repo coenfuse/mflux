@@ -1,7 +1,9 @@
 // standard includes
+#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <string>
+
 
 // internal includes
 #include "converters.h"
@@ -37,56 +39,54 @@ namespace felidae
     }
 
     ERC m2i_BASSAI(
-        mqtt::Message this_msg,
-        influx::Message &into_this)
+        mqtt::Message mqtt_msg,
+        influx::Message &influx_msg)
     {
         auto status = ERC::SUCCESS;
 
-        into_this.clear();
-
         try
         {
-            nlohmann::json payload = nlohmann::json::parse(this_msg.get_payload());
-            std::string dataStr = payload["DATA"].at(0).at(4);
+            using namespace std;
+            using namespace nlohmann;
 
-            // read 4 characters from index 6
-            std::string temp1_str = dataStr.substr(6,4);
-            int64_t temp1_num  = std::stoi(temp1_str, nullptr, 16);
+            json payload = json::parse(mqtt_msg.get_payload());
+            string data = payload["DATA"].at(0).at(4);
 
-            // read 4 characters from index 10
-            std::string temp2_str = dataStr.substr(10,4);
-            int64_t temp2_num  = std::stoi(temp2_str, nullptr, 16);
+            string temp1_str = data.substr(6,4);
+            int64_t temp1 = stoi(temp1_str, nullptr, 16);
 
-            // read 4 characters from index 30
-            std::string watt_str = dataStr.substr(30,4);
-            int64_t watt_int = std::stoi(watt_str, nullptr, 16);
+            string temp2_str = data.substr(10,4);
+            int64_t temp2 = stoi(temp2_str, nullptr, 16);
 
-            // normalize temprature values
-            temp1_num = (temp2_num - 1) * 65536 + temp1_num;
-            temp2_num = (temp2_num) * 65536 + temp1_num; 
+            string watt_str = data.substr(30,4);
+            int64_t watt = stoi(watt_str, nullptr, 16);
 
-            // fetch channel data // TODO - Remove white_space from Channel_Name
-            std::string channel_name = payload["DATA"].at(0).at(0);
-            std::string channel_str = payload["DATA"].at(0).at(1);
-            int64_t channel_num = std::stoi(channel_str, nullptr, 16);
+            string channel_name = payload["DATA"].at(0).at(0);
+            replace(channel_name.begin(), channel_name.end(), ' ', '_');
+            
+            string channel_code = payload["DATA"].at(0).at(1);
+            int channel_num = stoi(channel_code, nullptr, 16);
 
-            // Prepare influx data set
+            influx_msg.clear();
+
             if(channel_num == 1)
             {
-                into_this.set_measure("Measurement");
-                //into_this.add_tag_set("Channel", channel_name);
-                //into_this.add_tag_set("Channel_Number", channel_str);
-                into_this.add_field_set("CProd1", temp1_num);
-                into_this.add_field_set("CProd2", temp2_num);
-                into_this.add_field_set("CLoad", watt_int);
+                influx_msg.set_measure("Measurement");
+                //influx_msg.add_tag_set("Channel", channel_name);
+                //influx_msg.add_tag_set("Channel_Code", channel_code);
+                influx_msg.add_field_set("CProd1", temp1);
+                influx_msg.add_field_set("CProd2", temp2);
+                influx_msg.add_field_set("CLoad", watt);
             }
             else if(channel_num == 2)
             {
-                into_this.set_measure("Measurement");
-                //into_this.add_tag_set("Channel", channel_name);
-                //into_this.add_tag_set("Channel_Number", channel_str);
-                into_this.add_field_set("Temprature", temp1_num);
+                influx_msg.set_measure("Measurement");
+                //influx_msg.add_tag_set("Channel", channel_name);
+                //influx_msg.add_tag_set("Channel_Code", channel_code);
+                influx_msg.add_field_set("Temprature", temp1);
             }
+            else
+                status = ERC::FAILURE;
         }
         catch(std::exception& e)
         {
