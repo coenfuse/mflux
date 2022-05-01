@@ -4,17 +4,22 @@
 # This file provides conversion guidlines to minix module for converting mqtt
 # payloads to influx measurements. It requires the mqtt payload to be a JSON.
 
-BASSAI_2_bassai
-> T_IMEI            IMEI            0:0     STR STR
-> T_Region_Code     REGION{CODE}    0:0     DEC NUM
-> T_Channel_Name    DATA[0][0][0]   0:0     HEX STR
-> T_Channel_Code    DATA[0][0][1]   0:0     BIN NUM
+(M2I)-BASSAI_2_bassai
+> T_ORG             "string"        0:0     STR 
+> T_IMEI            IMEI            0:0     STR 
+> T_Region_Code     REGION{CODE}    0:0     DEC 
+> T_Channel_Name    DATA[0][0][0]   0:0     HEX 
+> T_Channel_Code    DATA[0][0][1]   0:0     BIN 
 > F_Temprature_C    DATA[0][0][4]   6:4     HEX NUM
-> F_Pressure        DATA[0][0][4]   16:8    HEX NUM
-> F_Wattage         DATA[0][0][4]   32:8    HEX NUM
-> F_Active          DATA[0][0][4]   60:4    HEX BOO
+> F_Pressure        DATA[0][0][4]   16:8    HEX FLO
+> F_Active          DATA[0][0][4]   60:4    BOO BOO
+> F_Response        RESPONSE        0:0     HEX STR
 
 # The specified config can be deduced as follows:
+# - '(M2I)-' specifies the type of conversion configuration this is. M2I means
+#   the following conversion configuration is for MQTT to Influx and I2M means
+#   the following conversion is for Influx to MQTT. At this moment we'll only
+#   discuss about M2I conversions.
 #
 # - 'BASSAI' is the MQTT payload's topic and 'bassai' is the name that'll given 
 #   to the calculated influx measurement.
@@ -36,15 +41,22 @@ BASSAI_2_bassai
 #   for eg: REGION{ZONE[4]} represents 4th object value from the ZONE key of the
 #   REGION object.
 #
+# - Alternatively, a constant value can also be provided for a field or a tag
+#   measure as opposed to JSON object.
+#
 # - Values specified with a colon in between just represent the number of bytes
 #   to take into consideration. 0:0 means taking full value in consideration.
 #   Whereas the rest means, start_from_index:upto_bits
 #
 # - The two flags in the end specify the data_type of value that is written in
-#   JSON and the data_type of value we need to convert it into.
+#   JSON and the data_type of value we need to convert it into. Note that the
+#   tag measurements do not have any CONV_TYPE specified with them. It is because
+#   tag measurements are always a string (as forced by influx) so they are always
+#   converted into string. Even if you have specified any CONV_TYPE, it will be
+#   ignored.
 
-
-{MQTT_TOPIC}_2_{INFLUX_MEASUREMENT}
-> T_{TAG_NAME}      JSON_KEY        start_index:upto    DATA_TYPE CONV_TYPE
-> T_{TAG_NAME}      JSON_KEY{}      start_index:upto    DATA_TYPE CONV_TYPE
-> F_{FIELD_NAME}    JSON_KEY[]..    start_index:upto    DATA_TYPE CONV_TYPE
+(CONV_FORMAT)-{MQTT_TOPIC}_2_{INFLUX_MEASUREMENT}
+> T_{TAG_NAME}		CONSTANT		start_index:upto	DATA_TYPE
+> T_{TAG_NAME}      JSON_KEY        start_index:upto    DATA_TYPE  
+> F_{FIELD_NAME}	CONSTANT		start_index:upto	DATA_TYPE CONV_TYPE
+> F_{FIELD_NAME}    JSON_KEY    	start_index:upto    DATA_TYPE CONV_TYPE
