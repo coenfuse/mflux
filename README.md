@@ -9,7 +9,7 @@ InfluxDB.
 
 ## Project
 
-- [Build Mflux](dat/docs//project/build.md)
+- [Build Mflux](dat/docs/project/build.md)
 - [Project Setup](dat/docs/project/setup.md)
 - [Study codebase](dat/docs/project/study.md)
 - [Test Mflux](dat/docs/project/test.md)
