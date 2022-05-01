@@ -1,7 +1,7 @@
 # Build Mflux
 
-- Mflux is a cross-platform app that can be deployed on both, Windows and
-Linux system. 
+- Mflux is a cross-platform app that can be deployed on both, Windows and Linux
+Ubuntu systems. 
 - To simplify cross-platform build processes, Mflux uses [CMake](https://cmake.org/).
 - It is recommended to build MFlux for Linux systems as the Windows app is unstable.
 
