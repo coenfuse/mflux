@@ -4,6 +4,7 @@
 
 // internal includes
 #include "minix/minix.h"
+#include "conv/converters.h"
 
 
 // module includes
@@ -28,12 +29,18 @@ namespace felidae
         {
             auto status = ERC::SUCCESS;
 
-            into_this.clear();
-            
-            into_this.set_measure(this_msg.get_topic());
-            into_this.add_tag_set("payload", this_msg.get_payload());
-            into_this.add_field_set("retention", this_msg.get_to_retain());
-            into_this.add_field_set("qos", (int64_t)this_msg.get_qos());
+            if(this_msg.get_topic().empty())
+                status = ERC::FAILURE;
+
+            if(status == ERC::SUCCESS)
+            {
+                auto converter = M2I_conv.find(this_msg.get_topic());
+
+                if(converter == M2I_conv.end())
+                    status = ERC::FAILURE;
+                else
+                    status = converter->second(this_msg, into_this);
+            }
             
             return status;
         }

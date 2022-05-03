@@ -66,8 +66,8 @@ namespace felidae
 		{
 			auto status = ERC::SUCCESS;
 
-			// m_pHTTP_cli->set_keep_alive(false);
-			// m_pHTTP_cli.reset();		// After stopping the thread
+			m_pHTTP_cli->set_keep_alive(false);
+			m_pHTTP_cli.reset();
 
 			return status;
 		}
@@ -85,7 +85,7 @@ namespace felidae
 			return status;
 		}
 
-
+		/*
 		ERC Client::query(std::string org_name, std::string bucket, std::string flux_query)
 		{
 			auto status = ERC::SUCCESS;
@@ -94,6 +94,7 @@ namespace felidae
 
 			return status;
 		}
+		*/
 
 		ERC Client::write(std::string org, std::string bucket, Message data)
 		{
@@ -101,20 +102,46 @@ namespace felidae
 
 			if(this->is_connected())
 			{
-				auto path = fmt::format("/api/v2/write?org={}&bucket={}&precision=us", org, bucket);
+				// Update write path
+				auto path = fmt::format(
+					"/api/v2/write?org={}&bucket={}&precision={}", 
+					org, 
+					bucket, 
+					data.get_timestamp_precision()
+				);
 
+				// Update write headers
 				httplib::Headers headers = {
 					{"Authorization", fmt::format("Token {}", m_token)},
 					{"Content-Type", "text/plain; charset=utf-8"},
 					{"Accept", "application/json"}
 				};
 
-				auto res = m_pHTTP_cli->Post(path.c_str(), headers, data.dump().c_str(), data.dump().length(), "text/plain");
+				// Write using HTTP POST
+				auto res = m_pHTTP_cli->Post(
+					path.c_str(), 
+					headers, 
+					data.dump().c_str(), 
+					data.dump().length(), 
+					"text/plain"
+				);
 
+				// Analyse response
 				if(res->status == 204)
+				{
 					spdlog::info("{} write success", SELF_NAME);
+					status = ERC::SUCCESS;
+				}
 				else
-					spdlog::warn("{} write failure with HTTP code {} and res {} for data {}", SELF_NAME, res->status, res->body, data.dump());
+				{
+					spdlog::warn(
+						"{} write failure with HTTP code {}:{} for data {}",
+						SELF_NAME, 
+						res->status, 
+						res->body,
+						data.dump()
+						);
+				}
 			}
 
 			return status;
@@ -142,7 +169,7 @@ namespace felidae
 						m_pConfig->get_influx_db_auth_key());
 
 				if (status == ERC::SUCCESS)
-					m_worker = std::thread(s_service_wrapper, this);
+					m_worker = std::thread(si_service_wrapper, this);
 
 				if (this->is_running())
 					status = ERC::SUCCESS;
@@ -167,7 +194,15 @@ namespace felidae
 				m_signalled_stop.exchange(true);
 				m_worker.join();
 
-				spdlog::info("{} service stopped", SELF_NAME);
+				this->disconnect();
+
+				if(this->is_running())
+					status = ERC::FAILURE;
+
+				if(status == ERC::SUCCESS)
+					spdlog::info("{} service stopped", SELF_NAME);
+				else
+					spdlog::error("{} service failed to stop with code {}", SELF_NAME, status);
 			}
 
 			return status;
@@ -182,7 +217,7 @@ namespace felidae
 
 		// PRIVATE DEFINIIIONS
 
-		void Client::m_actual_job(void)
+		void Client::i_actual_job(void)
 		{
 			auto status = ERC::SUCCESS;
 
@@ -219,10 +254,10 @@ namespace felidae
 			}
 		}
 
-		void Client::s_service_wrapper(void* instance)
+		void Client::si_service_wrapper(void* p_instance)
 		{
-			Client* self_instance = (Client*)instance;
-			self_instance->m_actual_job();					// This thread blocks here
+			// Thread blocks here
+			static_cast<Client*>(p_instance)->i_actual_job();
 		}
 	}
 }
