@@ -2,7 +2,7 @@
 
 # Adding directories that contain source files
 set(PROJECT_HDRS "include/minix/minix.h")
-set(PROJECT_SRCS "src/minix.cpp")
+set(PROJECT_SRCS "src/minix.cpp" "src/conv/converters.h" "src/conv/converters.cpp")
 
 # Setting up target
 project("minix" VERSION 0.3.0)
@@ -27,6 +27,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES 
 
 # Linking target with directories it is dependent on
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/source/thirdparty/nlohmann-json/include/")
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/modules/errorcodes/include/")
 
 # Linking target with its third-party dependencies

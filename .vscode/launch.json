@@ -8,13 +8,13 @@
             "program": "${workspaceFolder}/out/build/source/apps/mflux/mflux-main",
             "args": [
                 "--config",
-                "${workspaceFolder}/config/mflux_local.config.jsonc",
+                "${workspaceFolder}/config/mflux.local.config.jsonc",
                 "--stdout",
                 "-v"
             ],
             "stopAtEntry":false,
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "build"
+            //"preLaunchTask": "build"
         }
     ]
 }
