@@ -445,7 +445,7 @@ namespace felidae
 
 				#ifdef WIN32
 					m_is_monitoring.exchange(true);
-					m_monitor_thread = std::thread(s_network_monitor_wrapper, this);
+					m_monitor_thread = std::thread(si_network_monitor_wrapper, this);
 					
 					std::this_thread::sleep_for(std::chrono::milliseconds(500));		// Wait to start up
 					
