@@ -37,7 +37,7 @@ namespace felidae
 		ERC Client::connect(std::string host, uint16_t port, std::string token)
 		{
 			auto status = ERC::SUCCESS;
-			int httpres = 0;
+			int httpres = 404;
 
 			m_pHTTP_cli = std::make_shared<httplib::Client>(host, port);
 			m_token = token;
@@ -45,8 +45,12 @@ namespace felidae
 			if (m_pHTTP_cli == nullptr)
 				status = ERC::MEMORY_ALLOCATION_FAILED;
 
-			if (status == ERC::SUCCESS)
-				httpres = m_pHTTP_cli->Get("/ping")->status;
+			if(status == ERC::SUCCESS)
+			{
+				auto result = m_pHTTP_cli->Get("/ping");
+				if(result != nullptr)
+					httpres = result->status;
+			}
 
 			if(httpres != 204)
 				status = ERC::FAILURE;
