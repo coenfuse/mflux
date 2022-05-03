@@ -52,6 +52,8 @@ namespace felidae
             json payload = json::parse(mqtt_msg.get_payload());
             string data = payload["DATA"].at(0).at(4);
 
+            string imei = to_string(payload["IM"]);
+
             string temp1_str = data.substr(6,4);
             int64_t temp1 = stoi(temp1_str, nullptr, 16);
 
@@ -74,6 +76,7 @@ namespace felidae
                 influx_msg.set_measure("Measurement");
                 influx_msg.add_tag_set("Channel", channel_name);
                 influx_msg.add_tag_set("Channel_Code", channel_code);
+                influx_msg.add_field_set("IMEI", imei);
                 influx_msg.add_field_set("CProd1", temp1);
                 influx_msg.add_field_set("CProd2", temp2);
                 influx_msg.add_field_set("CLoad", watt);
@@ -83,6 +86,7 @@ namespace felidae
                 influx_msg.set_measure("Measurement");
                 influx_msg.add_tag_set("Channel", channel_name);
                 influx_msg.add_tag_set("Channel_Code", channel_code);
+                influx_msg.add_field_set("IMEI", imei);
                 influx_msg.add_field_set("Temprature", temp1);
             }
             else
