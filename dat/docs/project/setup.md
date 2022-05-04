@@ -1,14 +1,16 @@
 # Setup Mflux
 
-- Mflux is a cross-platform app that can be built and debugged on both, Windows 
-and Linux Ubuntu systems. 
-- To simplify cross-platform setup processes, Mflux uses [CMake](https://cmake.org/).
-- Microsoft [Visual Studio](https://visualstudio.microsoft.com/downloads/) & 
+- Mflux is cross-platform and can be developed on both, Windows & Linux. 
+- To support cross-platform setup, Mflux uses [CMake](https://cmake.org/).
+- [Visual Studio](https://visualstudio.microsoft.com/downloads/) & 
 MSVC are the recommended IDE & compiler on Windows.
-- Microsoft [VSCode](https://code.visualstudio.com/) & GCC are the recommended 
+- [VSCode](https://code.visualstudio.com/) & GCC are the recommended 
 editor & compiler on Linux.
 
-## Setup on Linux
+<br />
+<br />
+
+## Setup on Linux Ubuntu
 
 - [Install updates](#l01---install-updates)
 - [Install essential libs](#l02---install-essential-libraries)
@@ -23,6 +25,9 @@ editor & compiler on Linux.
 - [Use debugger](#l11---use-debugger)
 - [Send first payload](#l12---send-first-payload)
 
+<br />
+<br />
+
 ## Setup on Windows
 
 - [Install CMake](#w01---install-cmake)
@@ -36,17 +41,22 @@ editor & compiler on Linux.
 - [Use debugger](#w09---use-debugger)
 - [Send sample messages](#w10---send-first-payload)
 
----
+<br/>
+<br/>
+<br/>
 
-#### L01 - Install updates
+## 
+
+### L01 - Install updates
 Update the existing libraries and packages in your linux system by typing the
 following command in the terminal,
 ```
 sudo apt-get update
 ```
+<br/>
 
 
-#### L02 - Install essential libraries
+### L02 - Install essential libraries
 Install the essential build libraries and packages by typing the following command in the terminal,
 ```
 sudo apt-get install build-essential libssl-dev
@@ -54,31 +64,93 @@ sudo apt-get install build-essential libssl-dev
 - [What is libssl-dev?](https://www.openssl.org/)
 - [What is build-essential?](https://linuxhint.com/install-build-essential-ubuntu/)
 
+<br/>
 
-#### L03 - Install CMake
 
-#### L04 - Install and Setup InfluxDB
-#### L05 - Install and Setup Mosquitto
-#### L06 - Install and Setup VSCode
-#### L07 - Clone repository
-#### L08 - Understand config
-#### L09 - Build project
-#### L10 - Build tests
-#### L11 - Use debugger
-#### L12 - Send first payload
+### L03 - Install CMake
+<br/>
 
----
 
-#### W01 - Install CMake
-#### W02 - Install and Setup Mosquitto
-#### W03 - Install and Setup InfluxDB
-#### W04 - Install and Setup Visual Studio
-#### W05 - Clone repository
-#### W06 - Understand config
-#### W07 - Build project
-#### W08 - Build tests
-#### W09 - Use debugger
-#### W10 - Send first payload
+### L04 - Install and Setup InfluxDB
+<br/>
+
+
+### L05 - Install and Setup Mosquitto
+<br/>
+
+
+### L06 - Install and Setup VSCode
+<br/>
+
+
+### L07 - Clone repository
+<br/>
+
+
+### L08 - Understand config
+<br/>
+
+
+### L09 - Build project
+<br/>
+
+
+### L10 - Build tests
+<br/>
+
+
+### L11 - Use debugger
+<br/>
+
+
+### L12 - Send first payload
+<br/>
+
+<br />
+<br />
+<br />
+
+## 
+
+### W01 - Install CMake
+<br/>
+
+
+### W02 - Install and Setup Mosquitto
+<br/>
+
+
+### W03 - Install and Setup InfluxDB
+<br/>
+
+
+### W04 - Install and Setup Visual Studio
+<br/>
+
+
+### W05 - Clone repository
+<br/>
+
+
+### W06 - Understand config
+<br/>
+
+
+### W07 - Build project
+<br/>
+
+
+### W08 - Build tests
+<br/>
+
+
+### W09 - Use debugger
+<br/>
+
+
+### W10 - Send first payload
+<br/>
+
 
 - [Install CMake](https://vitux.com/how-to-install-cmake-on-ubuntu/)
 - [Install Mosquitto](https://mosquitto.org/download/) by typing the following,
