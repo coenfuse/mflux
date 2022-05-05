@@ -12,34 +12,34 @@ editor & compiler on Linux.
 
 ## Setup on Linux Ubuntu
 
-- [Install updates](#l01---install-updates)
-- [Install essential libs](#l02---install-essential-libraries)
-- [Install CMake](#l03---install-cmake)
-- [Install and Setup InfluxDB](#l04---install-and-setup-influxdb)
-- [Install and Setup Mosquitto](#l05---install-and-setup-mosquitto)
-- [Install and Setup VSCode](#l06---install-and-setup-vscode)
-- [Clone repository](#l07---clone-repository)
-- [Understand config](#l08---understand-config)
-- [Build project](#l09---build-project)
-- [Build tests](#l10---build-tests)
-- [Use debugger](#l11---use-debugger)
-- [Send first payload](#l12---send-first-payload)
+01. [Install updates](#l01---install-updates)
+02. [Install essential libs](#l02---install-essential-libraries)
+03. [Install CMake](#l03---install-cmake)
+04. [Install and Setup InfluxDB](#l04---install-and-setup-influxdb)
+05. [Install and Setup Mosquitto](#l05---install-and-setup-mosquitto)
+06. [Install and Setup VSCode](#l06---install-and-setup-vscode)
+07. [Clone repository](#l07---clone-repository)
+08. [Understand config](#l08---understand-config)
+09. [Build project](#l09---build-project)
+10. [Build tests](#l10---build-tests)
+11. [Use debugger](#l11---use-debugger)
+12. [Send first payload](#l12---send-first-payload)
 
 <br />
 <br />
 
 ## Setup on Windows
 
-- [Install CMake](#w01---install-cmake)
-- [Install and Setup Mosquitto](#w02---install-and-setup-mosquitto)
-- [Install and Setup InfluxDB](#w03---install-and-setup-influxdb)
-- [Install Visual Studio](#w04---install-and-setup-visual-studio)
-- [Clone repository](#w05---clone-repository)
-- [Understand config](#w06---understand-config)
-- [Build project](#w07---build-project)
-- [Build test](#w08---build-tests)
-- [Use debugger](#w09---use-debugger)
-- [Send sample messages](#w10---send-first-payload)
+01. [Install CMake](#w01---install-cmake)
+02. [Install and Setup Mosquitto](#w02---install-and-setup-mosquitto)
+03. [Install and Setup InfluxDB](#w03---install-and-setup-influxdb)
+04. [Install Visual Studio](#w04---install-and-setup-visual-studio)
+05. [Clone repository](#w05---clone-repository)
+06. [Understand config](#w06---understand-config)
+07. [Build project](#w07---build-project)
+08. [Build test](#w08---build-tests)
+09. [Use debugger](#w09---use-debugger)
+10. [Send sample messages](#w10---send-first-payload)
 
 <br/>
 <br/>
@@ -68,6 +68,46 @@ sudo apt-get install build-essential libssl-dev
 
 
 ### L03 - Install CMake
+In this CMake installation method, we are going to build and install the latest version of CMake from its source code. Firstly, open the terminal and go to the `tmp` directory,
+```
+cd /tmp
+```
+
+Dowload the latest source code from Kitware's github by typing the following in terminal,
+```
+wget https://github.com/Kitware/CMake/releases/download/v3.23.0-rc4/cmake-3.23.0-rc4.tar.gz
+```
+_At the time of writing this documentation, the latest version of CMake was v3.23.0-rc4. It is very likely that at the time of your setup CMake has progressed in its development and released new versions. To download them, first check the latest release version number [here](https://github.com/Kitware/CMake/releases) and then update the version info in the above `wget` command accordingly._
+
+Extract the downloaded archive into a folder by using the following command,
+```
+tar -zxvf cmake-3.23.0-rc4.tar.gz
+```
+
+Go into the extracted folder,
+```
+cd cmake-3.23.0-rc4 
+```
+
+Now compile and install CMake by typing running the bootstrap script as follows,
+```
+./bootstrap
+```
+
+This will be long process, do not interrupt it. If succeeded, it will print
+```
+CMake has bootstrapped. Now run make.
+```
+
+Start the make file by typing just `make` in the terminal.
+And then finish the installation by typing `sudo make install`
+
+Verify the installd CMake by checking its install version from terminal. Type,
+```
+cmake --version
+```
+If successful, this should print `cmake version 3.23.0-rc4` or the number of latest version you've installed.
+
 <br/>
 
 
@@ -84,6 +124,17 @@ sudo apt-get install build-essential libssl-dev
 
 
 ### L07 - Clone repository
+Clone the repository to your system using the git command in terminal,
+```
+git clone https://github.com/coenfuse/mflux
+```
+Alternatively, you can download the [released source archive](https://github.com/coenfuse/mflux/releases) and extract it in a folder of choice.
+Now open the repository in VSCode by using the following commands,
+```
+cd <path/to/repo>
+code .
+```
+
 <br/>
 
 
