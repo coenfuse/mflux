@@ -10,7 +10,7 @@ Ubuntu systems.
 - Clone the repository.
 - [Install CMake](https://vitux.com/how-to-install-cmake-on-ubuntu/)
 - [Install InfluxDB & Influx CLI](https://docs.influxdata.com/influxdb/v2.2/install/) (Optional) 
-- [Install Mosquitto](https://cmake.org/download/) typing the following,
+- [Install Mosquitto](https://mosquitto.org/download/) typing the following,
 ```
 sudo apt-get install mosquitto
 sudo apt-get install libmosquitto-dev
