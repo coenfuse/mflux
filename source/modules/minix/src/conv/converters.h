@@ -50,6 +50,11 @@ namespace felidae
         mqtt::Message this_msg,
         influx::Message &into_this);
 
+    /// [M2I] SMSCPMS
+    ERC m2i_SMSCPMS(
+        mqtt::Message this_msg,
+        influx::Message &into_this);
+
     // Contains list of converter functions indexed by unique id in a single map
     // object. This allows instant access to required converter for received msg type
 
@@ -58,6 +63,7 @@ namespace felidae
         std::string,
         std::function<ERC(mqtt::Message, influx::Message &)>>
         M2I_conv = {
+            {"SMSCPMS", m2i_SMSCPMS},
             {"BASSAI", m2i_BASSAI},
             {"mflux_debug", m2i_mflux_debug}
 

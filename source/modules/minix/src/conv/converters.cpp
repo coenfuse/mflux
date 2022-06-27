@@ -104,4 +104,45 @@ namespace felidae
 
         return status;
     }
+
+    ERC m2i_SMSCPMS(
+        mqtt::Message mqtt_msg,
+        influx::Message &influx_msg
+    )
+    {
+        auto status = ERC::SUCCESS;
+
+        try
+        {
+            using namespace std;
+            using namespace nlohmann;
+
+            json payload = json::parse(mqtt_msg.get_payload());
+            string data = payload["DATA"].at(0).at(4);
+
+            string runtime_str = data.substr(6,4);
+            int64_t runtime = stoi(runtime_str, nullptr, 16);
+
+            string downtime_str = data.substr(10,4);
+            int64_t downtime = stoi(downtime_str, nullptr, 16);
+
+            influx_msg.clear();
+
+            influx_msg.set_measure("SMSC_Stat");
+            influx_msg.add_tag_set("SMSC", "ScreenM_C");
+            influx_msg.add_field_set("RunTime", runtime);
+            influx_msg.add_field_set("DownTime", downtime);
+        }
+        catch(std::exception& e)
+        {
+            spdlog::error(
+                "MINIX : Exception '{}' in M2I conv. for payload '{}'",
+                e.what(),
+                mqtt_msg.get_payload());
+
+            status = ERC::EXCEPTION;
+        }
+
+        return status;
+    }
 }
