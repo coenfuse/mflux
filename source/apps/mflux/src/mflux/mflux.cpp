@@ -42,7 +42,10 @@ namespace felidae
             status = init_logging();
 
         if (status == ERC::SUCCESS)
+        {
+            fmt::print("{} v{} (c) 2022-2023 Felidae Systems Inc.\n\n", m_name, m_version);
             spdlog::debug("{} starting", SELF_NAME);
+        }
 
         if (status == ERC::SUCCESS)
             m_engine = std::make_unique<felidae::Engine>();
