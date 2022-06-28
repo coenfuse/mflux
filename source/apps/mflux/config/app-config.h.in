@@ -4,7 +4,7 @@
 #pragma once
 
 #define app_NAME "@PROJECT_NAME@"
-#define app_VERSION "@PROJECT_VERSION@b-16"
+#define app_VERSION "@PROJECT_VERSION@b-17"
 #define app_DESCRIPTION "@PROJECT_DESCRIPTION@"
 
 #define app_VERSION_MAJOR @CMAKE_PROJECT_VERSION_MAJOR@

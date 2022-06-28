@@ -120,11 +120,16 @@ namespace felidae
             json payload = json::parse(mqtt_msg.get_payload());
             string data = payload["DATA"].at(0).at(4);
 
-            string runtime_str = data.substr(6,4);
-            int64_t runtime = stoi(runtime_str, nullptr, 16);
+            int64_t runtime = 0;
+            int64_t downtime = 0;
 
-            string downtime_str = data.substr(10,4);
-            int64_t downtime = stoi(downtime_str, nullptr, 16);
+            // Using payload for data conversion only if has enough bits.
+            // Here constant is 16 because our max data lookup is substr(10, 4)
+            if (data.length() >= 16)
+            {
+                runtime  = stoi(data.substr(6,4), nullptr, 16);
+                downtime = stoi(data.substr(10,4), nullptr, 16);
+            }
 
             influx_msg.clear();
 
