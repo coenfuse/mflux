@@ -79,6 +79,8 @@ namespace felidae
 
 			~Message(void){}
 
+			/// TODO - Increase docs verbosity as done in Influx Client
+
 			/// Get name of measurement, if exists
 			inline std::string get_measure(void) const;
 
@@ -122,7 +124,7 @@ namespace felidae
 			inline ERC set_timestamp_precision(TimeStamp_t timestamp_precision);
 
 			/// Serialize this measurement
-			inline std::string dump(void) const;
+			inline std::string dump(bool inc_timestamp = true) const;
 
 			// TODO - define parse()
 			// static inline ERC parse(std::string msg) const;
@@ -360,7 +362,7 @@ namespace felidae
 
 
 
-		std::string Message::dump(void) const
+		std::string Message::dump(bool inc_timestamp) const
 		{
 			std::string dump;
 
@@ -369,9 +371,7 @@ namespace felidae
 
 			// Adding tags
 			for (auto tag_set : m_tags)
-			{
 				dump += fmt::format(",{}={}", tag_set.first, tag_set.second);
-			}
 
 			// Adding required space between tag_set and field_set
 			dump.push_back(' ');
@@ -389,7 +389,8 @@ namespace felidae
 			dump.pop_back();
 
 			// Adding timestamp
-			dump += fmt::format(" {}", m_timestamp);
+			if(inc_timestamp)
+				dump += fmt::format(" {}", m_timestamp);
 
 			return dump;
 		}
