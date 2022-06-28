@@ -65,6 +65,8 @@ namespace felidae
 			// connect asynchronously to mqtt
 			if (status == ERC::SUCCESS)
 			{
+				spdlog::debug("{} connecting to {}:{}", SELF_NAME, host, port);
+
 				if(!m_is_mosq_connected)
 					mosq_erc = mosquitto_connect_async(m_pMosq, host.c_str(), port, timeout_s);
 
@@ -243,7 +245,8 @@ namespace felidae
 						m_pConfig->get_mqtt_timeout_s()
 					);
 
-				// subscribe to topics (TODO : Add break when subscribe fails)
+				// subscribe to topics
+				// TODO - Add break when subscribe fails
 				if(status == ERC::SUCCESS)
 					for (auto subscription : m_pConfig->get_mqtt_sub_list())
 						status = this->subscribe(
