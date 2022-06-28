@@ -5,7 +5,7 @@
             "name": "Debug",
             "request": "launch",
             "type": "cppdbg",
-            "program": "${workspaceFolder}/out/build/source/apps/mflux/mflux-main",
+            "program": "${workspaceFolder}/out/bld/source/apps/mflux/mflux-main",
             "args": [
                 "--config",
                 "${workspaceFolder}/config/mflux.local.config.jsonc",

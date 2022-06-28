@@ -1,9 +1,11 @@
 bin/*
-build/*
-docs/*
-logs/*
+bld/*
+doc/*
+log/*
+rel/*
 
 !bin
 !make
 !index.html
 !log
+!pkg
