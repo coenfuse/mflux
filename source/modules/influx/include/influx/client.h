@@ -108,6 +108,25 @@ namespace felidae
 				Message data
 			);
 
+
+			/// NOTE : Backwards compatible support for InfluxAPI v1.x only.
+			/// Write a data point/message to data bucket that must be present
+			/// on the InfluxDB remote. Requires client to be a connected to
+			/// remote. This is a blocking call.
+			/// 
+			/// bucket - bucket name to write the data into
+			/// data   - influx::Message object containing data that is to be written
+			///
+			/// return ERC.SUCCESS - if remote responds on write req with 204
+			/// return ERC.FAILURE - otherwise
+			///
+			/// NOTE - The log messages provide detailed info on HTTP response 
+			///		   in case of an error.
+			ERC write_v1( 
+				std::string bucket, 
+				Message data
+			);
+
 			
 			// NOTE - The following three methods are going to be depreciated
 			// in future releases of mflux as they increase module coupling.

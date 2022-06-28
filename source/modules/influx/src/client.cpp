@@ -106,6 +106,9 @@ namespace felidae
 
 			if(this->is_connected())
 			{
+				// Get payload
+				auto payload = data.dump();
+
 				// Update write path
 				auto path = fmt::format(
 					"/api/v2/write?org={}&bucket={}&precision={}", 
@@ -125,8 +128,8 @@ namespace felidae
 				auto res = m_pHTTP_cli->Post(
 					path.c_str(), 
 					headers, 
-					data.dump().c_str(), 
-					data.dump().length(), 
+					payload.c_str(), 
+					payload.length(),
 					"text/plain"
 				);
 
@@ -143,8 +146,57 @@ namespace felidae
 						SELF_NAME, 
 						res->status, 
 						res->body,
-						data.dump()
-						);
+						payload
+					);
+				}
+			}
+
+			return status;
+		}
+
+
+		ERC Client::write_v1(std::string bucket, Message data)
+		{
+			auto status = ERC::FAILURE;
+
+			if(this->is_connected())
+			{
+				// Get payload
+				auto payload = data.dump(false);
+
+				// Update write path
+				auto path = fmt::format("/write?db={}", bucket);
+
+				// Update write headers
+				httplib::Headers headers = {
+					{"Content-Type", "text/plain; charset=utf-8"},
+					{"Accept", "application/json"}
+				};
+
+				// Write using HTTP POST
+				auto res = m_pHTTP_cli->Post(
+					path.c_str(),
+					headers,
+					payload.c_str(),
+					payload.length(),
+					"text/plain"
+				);
+
+				// Analyze response
+				if(res->status == 204)
+				{
+					spdlog::info("{} write success", SELF_NAME);
+					status = ERC::SUCCESS;
+				}
+				else
+				{
+					spdlog::warn(
+						"{} write failure with HTTP code {}:{} for data {}",
+						SELF_NAME,
+						res->status,
+						res->body,
+						payload
+					);
 				}
 			}
 
@@ -247,10 +299,18 @@ namespace felidae
 
 					// Send it to Influx DB
 					if (status == ERC::SUCCESS)
+					{
+						status = this->write_v1(
+							m_pConfig->get_influx_db_name(),
+							influx_msg);
+						
+						/*
 						status = this->write(
 							m_pConfig->get_influx_org_name(),
 							m_pConfig->get_influx_db_name(),
 							influx_msg);
+						*/
+					}
 				}
 
 				// Take a breath for while
