@@ -1,0 +1,1 @@
+app/mflux-main --config config/mflux.config.jsonc --stdout

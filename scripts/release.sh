@@ -1,6 +1,6 @@
 # TODO - The following ROOT will not work if this script is invoked from outside
 # of the scripts folder because we have '../' here
- 
+
 # Getting root directory for relative operations (one dir back /scripts)
 ROOT="$PWD/../"
 
@@ -18,9 +18,8 @@ BLD_PATH="$ROOT/out/rel/bld"
 # Creating package folder structure
 mkdir $PKG_PATH/app
 mkdir $PKG_PATH/config
-mkdir $PKG_PATH/dat
-mkdir $PKG_PATH/doc
-mkdir $PKG_PATH/etc
+# mkdir $PKG_PATH/dat
+# mkdir $PKG_PATH/etc
 mkdir $PKG_PATH/out
 
 # Build project files
@@ -31,13 +30,14 @@ cmake --build $BLD_PATH
 
 # Copying files
 cp $ROOT/config/mflux.config.jsonc $PKG_PATH/config
-cp $ROOT/dat/release/readme.txt $PKG_PATH
-cp $ROOT/dat/release/start.sh $PKG_PATH
+cp $ROOT/dat/relpkg/readme.txt $PKG_PATH
+cp $ROOT/dat/relpkg/start.sh $PKG_PATH
 
 # Creating zip (The 'cd' helps in creating a zip without any root folder)
 cd $PKG_PATH
 zip -r ../mflux.zip .                                                           
 
 # Cleaning up
-rm -r $ROOT/out/rel/bld/
-rm -r $ROOT/out/rel/pkg/
+rm -r $BLD_PATH
+rm -r $PKG_PATH
+touch $ROOT/out/rel/pkg
